@@ -10,7 +10,7 @@ These skills use advanced Claude Code features including `context: fork` for iso
 
 ```bash
 # Clone into your Claude Code skills directory
-git clone https://github.com/andre-zilla/claude-skills.git ~/.claude/skills
+git clone https://github.com/DRAZY/claude-skills.git ~/.claude/skills
 
 # That's it — open Claude Code and type / to see all available skills
 ```
