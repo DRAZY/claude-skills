@@ -1,5 +1,6 @@
 ---
 name: mastra-expert
+version: "1.0.0"
 description: Expert-level guidance for Mastra AI framework — agents, workflows, memory, RAG, MCP, tools, voice, models, evals, observability, server, and deployment. USE WHEN building Mastra apps, creating agents, designing workflows, configuring memory, setting up RAG pipelines, integrating MCP servers, adding voice, routing models, writing evals, or deploying to cloud.
 argument-hint: "[task or question about Mastra]"
 allowed-tools:

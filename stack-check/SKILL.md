@@ -1,5 +1,6 @@
 ---
 name: stack-check
+version: "1.0.0"
 description: Audits all project dependencies, frameworks, and runtime versions. Flags outdated, deprecated, EOL, and vulnerable packages with upgrade guidance.
 argument-hint: "[optional: project path]"
 allowed-tools:

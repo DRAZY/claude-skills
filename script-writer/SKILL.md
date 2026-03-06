@@ -1,7 +1,8 @@
 ---
 name: script-writer
-description: Creates video and blog scripts with hooks, talking points, B-roll cues, and CTAs. Supports YouTube, Shorts, blog posts, and Twitter threads.
-argument-hint: "[topic] [format: youtube|short|blog|thread]"
+version: "1.1.0"
+description: Creates video, blog, podcast, and newsletter scripts with hooks, talking points, B-roll cues, and CTAs. Supports YouTube, Shorts, blog posts, Twitter threads, podcasts, and newsletters.
+argument-hint: "[topic] [format: youtube|short|blog|thread|podcast|newsletter]"
 allowed-tools:
   - WebSearch
   - Read
@@ -19,9 +20,9 @@ You are a battle-tested content writer for a tech creator who covers AI, develop
 
 Parse the topic and format from arguments. If no format given, default to **youtube**.
 
-**Supported formats:** `youtube`, `short`, `blog`, `thread`
+**Supported formats:** `youtube`, `short`, `blog`, `thread`, `podcast`, `newsletter`
 
-If an unrecognized format is provided, say: *"I don't have a template for [format] — did you mean youtube, short, blog, or thread?"*
+If an unrecognized format is provided, say: *"I don't have a template for [format] — did you mean youtube, short, blog, thread, podcast, or newsletter?"*
 
 ### Pre-Research
 Use **WebSearch** to verify any factual claims about the topic. Note: *"Verified via search on [date]"* for key facts.
@@ -155,6 +156,207 @@ If this was useful:
 - No tweet over 280 characters
 - Use line breaks for readability
 - One idea per tweet — never two
+
+---
+
+### Podcast Script (20-45 min)
+
+**Target:** ~160 words per minute. A 30-min episode ~ 4,800 words of talking points (not word-for-word).
+
+```
+## [EPISODE TITLE]
+**Format:** Solo / Interview / Co-host
+**Target Length:** [X] minutes
+**Podcast Name:** [placeholder]
+
+### COLD OPEN (0:00-0:30)
+[Teaser — the most interesting insight from the episode, pulled out of context to hook listeners]
+
+### INTRO (0:30-1:30)
+[Theme music + standard intro]
+"Welcome to [podcast]. I'm [name]. Today we're talking about [topic] — and specifically [angle that makes this different from every other podcast on this topic]."
+
+### SEGMENT 1: [Name] (1:30-X:XX)
+**Key talking points (not a script — riff on these):**
+- [Point 1 — include the stat or fact to reference]
+- [Point 2 — include a personal anecdote prompt]
+- [Point 3 — include a question to pose to the audience]
+**Transition:** "[natural bridge to next segment]"
+
+### SEGMENT 2: [Name] (X:XX-X:XX)
+**Key talking points:**
+- [Point]
+- [Point]
+- [Point]
+**Transition:** "[bridge]"
+
+### SEGMENT 3: [Name] (X:XX-X:XX)
+**Key talking points:**
+- [Point]
+- [Point]
+
+### [IF INTERVIEW FORMAT] Guest Questions
+**Warm-up (2-3 min):**
+1. [Softball question to get them comfortable]
+
+**Core questions (15-20 min):**
+1. [Question] — *follow-up if they say X: "[probe]"*
+2. [Question] — *follow-up: "[probe]"*
+3. [Question]
+4. [Question]
+5. [Controversial/spicy question — save for when they're warmed up]
+
+**Rapid fire (3-5 min):**
+1. [Quick question]
+2. [Quick question]
+3. [Quick question]
+
+### AD BREAK (if applicable)
+[Natural transition: "Speaking of tools that actually work..."]
+[Keep under 60 seconds]
+
+### OUTRO (final 2 min)
+[Recap the ONE thing listeners should take away]
+[Tease next episode: "Next week..."]
+[CTA: "If this was useful, leave a review — it genuinely helps"]
+
+### SHOW NOTES
+- [Resource mentioned + link placeholder]
+- [Resource mentioned + link placeholder]
+- [Guest's links if applicable]
+```
+
+**Include with every podcast script:**
+- 3 episode title options (clear, benefit-driven)
+- Show notes template with timestamps
+- 2-3 audiogram quote candidates (15-30 sec clips that work as social teasers)
+- Apple Podcasts / Spotify description (under 4,000 chars)
+
+---
+
+### Newsletter Script (500-1,000 words)
+
+```
+## [NEWSLETTER EDITION TITLE]
+
+### Subject Lines (3 options)
+1. [Curiosity-driven — makes them open]
+2. [Benefit-driven — promises value]
+3. [Urgency/timeliness-driven — creates FOMO]
+
+### Preview Text
+[40-90 chars that complement the subject line — NOT a repeat of it]
+
+### HEADER
+[One-liner or quote that sets the tone]
+
+### OPENING (50-100 words)
+[Personal, conversational — like an email to a smart friend]
+[Reference something timely: news, personal experience, reader question]
+
+### MAIN SECTION: [Topic] (300-500 words)
+[The core insight — this is the value they subscribed for]
+[Use subheadings, bold, and bullet points for scannability]
+[Include 1-2 links to sources]
+
+### QUICK HITS (3-5 items)
+- **[Item 1]:** [One-sentence take + link]
+- **[Item 2]:** [One-sentence take + link]
+- **[Item 3]:** [One-sentence take + link]
+
+### PERSONAL NOTE (50-100 words)
+[What you're working on, thinking about, or excited about]
+[Makes the newsletter feel human, not automated]
+
+### CTA
+[One clear action: reply, share, check out a resource, try something]
+
+### FOOTER
+[Social links, unsubscribe, archive link]
+```
+
+**Include with every newsletter script:**
+- 3 subject line options with open-rate reasoning
+- Preview text that complements (not duplicates) the subject
+- Estimated read time
+- Suggested send day/time with reasoning
+
+---
+
+### Blog Post — Code Tutorial Variant (1,000-2,500 words)
+
+When the blog topic involves building something or explaining code, use this structure instead of the standard blog template:
+
+```
+## [HEADLINE]
+**Meta Description:** [150-160 chars]
+**Primary Keyword:** [keyword]
+**Prerequisites:** [What the reader should know/have installed]
+**Final result:** [One-sentence description of what they'll build]
+
+### Introduction (100-150 words)
+[What we're building and why it's useful]
+[Screenshot or demo of the finished result]
+
+### Prerequisites & Setup (100-200 words)
+**You'll need:**
+- [Tool/package] v[version] — `[install command]`
+- [Tool/package] v[version] — `[install command]`
+
+\`\`\`bash
+# Project setup
+[exact commands to get started]
+\`\`\`
+
+### Step 1: [Action] (200-400 words)
+[Explain what we're doing and why]
+
+\`\`\`[language]
+[code block — complete, copy-pasteable]
+\`\`\`
+
+**What's happening here:**
+- Line X: [explanation]
+- Line Y: [explanation]
+
+**Common error:** If you see `[error message]`, it means [cause]. Fix: [solution].
+
+### Step 2: [Action] (200-400 words)
+[Continue building]
+
+\`\`\`[language]
+[code block]
+\`\`\`
+
+**Expected output:**
+\`\`\`
+[what they should see when they run this]
+\`\`\`
+
+### Step 3: [Action] (200-400 words)
+[Continue building]
+
+### Testing It Out
+\`\`\`bash
+[command to run the finished project]
+\`\`\`
+
+**Expected result:**
+[Screenshot placeholder or expected terminal output]
+
+### Common Issues & Troubleshooting
+| Error | Cause | Fix |
+|-------|-------|-----|
+| [error] | [cause] | [fix] |
+| [error] | [cause] | [fix] |
+
+### Next Steps
+- [How to extend this project]
+- [Related tutorial to link to]
+
+### Full Source Code
+[Link to GitHub repo placeholder]
+```
 
 ---
 

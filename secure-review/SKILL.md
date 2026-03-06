@@ -1,5 +1,6 @@
 ---
 name: secure-review
+version: "1.0.0"
 description: Comprehensive security audit that orchestrates Ghost Security scans plus manual OWASP Top 10 code review, auth analysis, and dependency health checks.
 argument-hint: "[optional: file, directory, or focus area]"
 allowed-tools:

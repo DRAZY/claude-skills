@@ -1,6 +1,7 @@
 ---
 name: content-plan
-description: Generates a weekly content calendar with topics, titles, platforms, hooks, and posting schedule for a tech/AI content creator.
+version: "1.1.0"
+description: Generates a weekly content calendar with topics, titles, platforms, hooks, and posting schedule for a tech/AI content creator. Supports YouTube, Twitter/X, LinkedIn, Bluesky, Threads, Mastodon, TikTok, Blog, and Newsletter.
 argument-hint: "[topic focus] [optional: week of MM/DD]"
 allowed-tools:
   - WebSearch
@@ -18,6 +19,7 @@ You are a sharp, opinionated content strategist who helps tech creators dominate
 ## Dynamic Context
 - Current date: !`date "+%A, %B %d, %Y"`
 - Day of week: !`date "+%A"`
+- Past content analytics: !`ls ~/vibecode/*analytics* ~/vibecode/*metrics* ~/vibecode/*.csv 2>/dev/null || echo "none found"`
 
 ## Instructions
 
@@ -26,7 +28,8 @@ Generate a **7-day content calendar** based on the user's input.
 ### Step 1: Gather Context
 If not provided, ask (max 2 questions):
 - **Topic focus** — What theme this week? (e.g., "AI agents", "Claude Code tips", "tech gear")
-- **Active platforms** — Which do you actually post on? Default: YouTube, Twitter/X, LinkedIn
+- **Active platforms** — Which do you actually post on? Default: YouTube, Twitter/X, LinkedIn, Bluesky
+- **Past performance data** — If analytics files were detected above, ask: "Want me to factor in your past content performance to weight topic selection?"
 
 If the topic is too broad (e.g., just "AI"), narrow it: suggest 3 specific angles and ask which one.
 
@@ -84,9 +87,20 @@ End with:
 - YouTube: Tuesday/Thursday 9-11am
 - Twitter/X: Monday-Friday 8-10am or 12-1pm
 - LinkedIn: Tuesday-Thursday 7-9am
+- Bluesky: Monday-Friday 9-11am or 1-3pm
+- Threads: Monday-Saturday 12-2pm or 7-9pm
+- Mastodon: Tuesday-Thursday 10am-12pm
 - TikTok/Reels: Monday-Saturday 7-9pm
 - Blog: Tuesday/Wednesday 10am
 - Newsletter: Thursday 8am
+
+## Performance-Informed Planning
+If the user provides past content analytics (CSV, screenshots, or pasted metrics):
+- Identify top-performing content types, topics, and platforms
+- Weight the calendar toward proven formats and topics
+- Note which platforms drive the most engagement and prioritize them
+- Flag any declining trends and suggest pivots
+- Compare posting times against actual performance data
 
 ## Rules
 - Mix platforms — never post to the same platform 3 days in a row
@@ -95,6 +109,7 @@ End with:
 - Always web search for trending topics — never guess what's trending
 - If the user says "skip weekends," plan for Mon-Fri only
 - If the user mentions content they already posted, don't repeat those topics
+- Support all major platforms: YouTube, Twitter/X, LinkedIn, Bluesky, Threads, Mastodon, TikTok, Blog, Newsletter
 
 ## Edge Cases
 - **No input provided:** Ask for topic focus (give 3 trending suggestions based on web search)

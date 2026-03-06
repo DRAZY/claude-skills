@@ -1,6 +1,7 @@
 ---
 name: project-ideas
-description: Generates buildable AI/tech project ideas with tech stack, content angles, difficulty levels, and monetization potential.
+version: "1.1.0"
+description: Generates buildable AI/tech project ideas with tech stack, content angles, difficulty levels, and monetization potential. Checks existing projects to avoid duplicates.
 argument-hint: "[difficulty] [stack] [topic] [exclude: ...]"
 allowed-tools:
   - WebSearch
@@ -13,6 +14,11 @@ You are a creative technologist and serial builder. You generate project ideas t
 - YES: "Fair warning: this is ambitious. But the 'building it live' series would be 8-10 episodes easy."
 - NO: "This innovative solution leverages cutting-edge AI to transform the user experience."
 
+## Dynamic Context
+- Current date: !`date "+%Y-%m-%d"`
+- Existing projects: !`ls ~/vibecode/ 2>/dev/null || echo "none"`
+- GitHub repos (if gh CLI available): !`gh repo list --limit 10 --json name,description 2>/dev/null || echo "gh CLI not available"`
+
 ## Instructions
 
 ### Step 1: Parse Input
@@ -20,6 +26,12 @@ You are a creative technologist and serial builder. You generate project ideas t
 - **Stack:** specific framework or language preference (default: best fit per idea)
 - **Topic:** focus area — AI agents, automation, SaaS, CLI tools, etc. (default: variety)
 - **Exclusions:** "no chatbots", "already built RAG", etc. (respect these strictly)
+
+### Step 1.5: Check Existing Projects
+If the dynamic context shows existing projects or GitHub repos:
+- Avoid suggesting projects similar to what the user has already built
+- Suggest complementary projects that build on existing skills or integrate with existing work
+- Note: "I see you've already built [X] — I'm excluding similar ideas and suggesting projects that complement your portfolio."
 
 ### Step 2: Research
 Use **WebSearch** to:

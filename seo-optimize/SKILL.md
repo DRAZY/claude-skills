@@ -1,7 +1,8 @@
 ---
 name: seo-optimize
-description: Optimizes content titles, descriptions, tags, and keywords for YouTube and blog SEO. Suggests A/B variants and trending angles.
-argument-hint: "[title or draft content] [platform: youtube|blog]"
+version: "1.1.0"
+description: Optimizes content titles, descriptions, tags, and keywords for YouTube, blog, podcast, and GitHub repo SEO. Suggests A/B variants and trending angles.
+argument-hint: "[title or draft content] [platform: youtube|blog|podcast|github]"
 allowed-tools:
   - WebSearch
   - Read
@@ -25,6 +26,8 @@ You are an SEO specialist who's grown multiple tech YouTube channels past 100K s
 - **Full draft content:** Extract key themes, then optimize
 
 Default platform: **youtube** (if not specified)
+
+**Supported platforms:** `youtube`, `blog`, `podcast`, `github`
 
 ### Step 2: Research
 Use **WebSearch** to:
@@ -114,7 +117,95 @@ H1: [Main title with primary keyword]
 
 ---
 
-#### Keyword Analysis (Both Platforms)
+#### Podcast SEO
+
+**Episode Title:** [Optimized — keyword-rich, under 80 characters, clear value proposition]
+
+**Show-Level SEO (one-time setup):**
+- **Podcast Name:** [Include primary niche keyword if possible]
+- **Show Description (Apple Podcasts):** [Under 4,000 chars, keyword-rich first 2 sentences]
+- **Category Selection:** [Primary + secondary Apple Podcasts categories]
+- **Author/Publisher:** [Optimized for search]
+
+**Per-Episode SEO:**
+- **Title options (3):** [Keyword front-loaded, clear benefit]
+- **Episode Description:**
+```
+[First 2 lines are critical — shown in search results and previews]
+
+[Summary of key topics covered — include guest name if applicable]
+
+[Timestamps:]
+[00:00] - [Topic]
+[XX:XX] - [Topic]
+
+[Links and resources mentioned:]
+- [Resource]: [URL placeholder]
+
+[Follow/subscribe links]
+```
+
+- **Transcript:** Recommend publishing full transcript on website (massive SEO value)
+- **Show Notes Page:** H2 structure with episode keywords, embedded player, key takeaways
+- **Apple Podcasts Tags:** [5-10 relevant tags]
+- **Spotify Topics:** [Select from Spotify's topic taxonomy]
+
+**Podcast directories to submit to:**
+- Apple Podcasts, Spotify, Google Podcasts, Amazon Music, Pocket Casts, Overcast
+
+---
+
+#### GitHub Repository SEO
+
+**Repository Name:** [Lowercase, hyphenated, includes primary keyword — e.g., `ai-agent-framework` not `my-project`]
+
+**Description (one-liner):** [Under 350 chars, starts with what it does, includes key technology names]
+
+**README.md SEO Structure:**
+```markdown
+# [Project Name] — [One-line value prop with primary keyword]
+
+[Badges: build status, npm version, license, stars]
+
+[2-3 sentence description — what it does, who it's for, why it's different]
+
+## Features
+- [Feature with keyword] — [brief description]
+- [Feature with keyword] — [brief description]
+
+## Quick Start
+\`\`\`bash
+[install + run commands]
+\`\`\`
+
+## Documentation
+[Link to docs]
+
+## Examples
+[Code examples — Google indexes these]
+
+## Contributing
+[Link to CONTRIBUTING.md]
+
+## License
+[License name]
+```
+
+**GitHub-Specific Optimization:**
+- **Topics/Tags:** [15-20 relevant topics — these are searchable on GitHub]
+- **Social Preview Image:** [1280x640px, project name + tagline + visual]
+- **Website URL:** [Link to docs or landing page — appears prominently]
+- **About Section:** [Concise, keyword-rich]
+
+**Discoverability Tips:**
+- Use GitHub Discussions for community (indexed by Google)
+- Publish to package registries (npm, PyPI) — cross-links boost ranking
+- Add to awesome-lists in your niche
+- Star/watch trending repos in same space (visibility through association)
+
+---
+
+#### Keyword Analysis (All Platforms)
 
 | Keyword | Type | Volume | Competition | Recommendation |
 |---------|------|--------|-------------|----------------|
@@ -123,6 +214,8 @@ H1: [Main title with primary keyword]
 | [keyword] | Long-tail | | | |
 | [keyword] | Long-tail | | | |
 | [keyword] | Related | | | |
+
+**Volume/competition disclaimer:** *Estimated based on search result density, autocomplete presence, and "People Also Ask" frequency — verify with actual tools (Ahrefs, SEMrush, TubeBuddy, vidIQ) for precise data.*
 
 **Trending angle:** [How to tie this into what's trending right now]
 **Content gap:** [What the top-ranking content is missing — this is your edge]
@@ -150,6 +243,8 @@ After applying these optimizations, verify with:
 - **Highly competitive keyword:** Flag it and suggest 3 long-tail alternatives
 - **Non-English content:** Ask what language, adjust keyword strategy
 - **Time-sensitive topic:** Note that SEO value decays fast — suggest an evergreen companion piece
+- **GitHub repo:** Focus on README structure, topics/tags, and package registry presence
+- **Podcast:** Emphasize transcript publishing and show notes page SEO
 
 ## Next Steps
 - Run `/script-writer` if you need the full script for this content

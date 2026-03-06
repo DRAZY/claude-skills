@@ -1,5 +1,6 @@
 ---
 name: defense-analyst
+version: "1.0.0"
 description: Defensive security research analyst for macOS binary analysis. Generates vulnerability reports, CVSS assessments, defensive monitoring tools, responsible disclosure docs, and research organization. Strictly defensive — never creates offensive exploits.
 argument-hint: "[analysis task, file path, or question]"
 allowed-tools:

@@ -1,6 +1,7 @@
 ---
 name: tool-review
-description: Researches an AI tool or tech product and generates a structured review outline with features, pros/cons, competitors, and video talking points.
+version: "1.1.0"
+description: Researches an AI tool or tech product and generates a structured review outline with features, pros/cons, competitors, accessibility assessment, and video talking points.
 argument-hint: "[tool or product name]"
 allowed-tools:
   - WebSearch
@@ -68,6 +69,16 @@ Specific scenarios to test on camera:
 2. [Scenario] — tests [capability], expected wow factor: high/medium/low
 3. [Scenario] — tests [edge case or failure mode]
 
+**Quick Test Checklist (run during review session):**
+- [ ] Sign up / install — how long does it take to get to "hello world"?
+- [ ] Core feature test — does the main selling point actually work as advertised?
+- [ ] Edge case test — try something unusual or complex
+- [ ] Speed test — measure response times for key operations
+- [ ] Error handling — break it intentionally — how graceful is the failure?
+- [ ] Export/portability — can you get your data out? What format?
+
+*If you've already tested the tool, paste a screenshot or output sample here and I'll incorporate real-world observations into the review.*
+
 #### Competitor Comparison
 
 | Feature | [This Tool] | [Alt 1] | [Alt 2] |
@@ -103,6 +114,15 @@ Rating scale:
 - **Talking points (5-7):** Bullet points for on-camera delivery
 - **Demo sequence:** Order to show features for maximum engagement
 - **Potential clickbait vs. honest title:** Show both, recommend the honest one
+
+#### Accessibility Assessment
+- **Keyboard navigation:** Can you use the tool without a mouse?
+- **Screen reader support:** Does it work with VoiceOver/NVDA?
+- **Color contrast:** Are UI elements readable for color-blind users?
+- **Mobile/responsive:** Does it work on mobile devices?
+- **Internationalization:** Multi-language support? RTL text?
+- **Accessibility verdict:** Accessible / Partially accessible / Inaccessible
+- *Flag any accessibility issues as cons — this matters increasingly for enterprise adoption.*
 
 #### Data Privacy Note
 - Where is data stored?

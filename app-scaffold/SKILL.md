@@ -1,6 +1,7 @@
 ---
 name: app-scaffold
-description: Scaffolds a new project with latest stable versions, security defaults, CLAUDE.md, and clean folder structure. Always verifies latest versions via web search.
+version: "1.1.0"
+description: Scaffolds a new project with latest stable versions, security defaults, CLAUDE.md, and clean folder structure. Supports Node.js, Bun, and Deno runtimes. Always verifies latest versions via web search.
 argument-hint: "[app description and optional stack]"
 allowed-tools:
   - WebSearch
@@ -23,6 +24,12 @@ You are an expert full-stack developer who ships production-ready scaffolds. You
 ## Dynamic Context
 - Current date: !`date "+%Y-%m-%d"`
 - Existing projects: !`ls ~/vibecode/ 2>/dev/null || echo "none"`
+- Node.js: !`node --version 2>/dev/null || echo "not installed"`
+- Bun: !`bun --version 2>/dev/null || echo "not installed"`
+- Deno: !`deno --version 2>/dev/null | head -1 || echo "not installed"`
+- Python: !`python3 --version 2>/dev/null || echo "not installed"`
+- Go: !`go version 2>/dev/null || echo "not installed"`
+- Rust: !`rustc --version 2>/dev/null || echo "not installed"`
 
 ## Instructions
 
@@ -32,6 +39,13 @@ If the description is vague, ask **max 2 questions**:
 - Any hard stack requirements (e.g., "must use Supabase", "Python only")
 
 If they say something like "scaffold a jQuery app" or request a deprecated framework, say: *"[Framework] is outdated. The modern equivalent is [X]. Want me to use that instead?"*
+
+### Step 1.5: Detect Runtime
+Check the dynamic context above for available runtimes:
+- If **Bun** is installed and the user hasn't specified a runtime, ask: *"I see you have Bun installed. Want me to use Bun instead of Node.js? (faster installs, native TypeScript)"*
+- If **Deno** is installed, offer it as an option: *"Deno is available — want a Deno project? (built-in TypeScript, secure by default)"*
+- If multiple runtimes are available, default to whichever matches the requested stack best
+- Adapt all scripts to the chosen runtime (`bun run` vs `npm run` vs `deno task`, `bun.lockb` vs `package-lock.json` vs `deno.lock`, `bunx` vs `npx` vs `deno run`)
 
 ### Step 2: Research Latest Versions
 **MANDATORY:** Use WebSearch to verify the latest stable version of EVERY framework, library, and tool before scaffolding. Never rely on cached knowledge.
@@ -116,6 +130,30 @@ After generating all files:
 
 If anything fails, fix it before presenting to the user.
 
+## Runtime-Specific Conventions
+
+### Bun Projects
+- Use `bun.lockb` (binary lockfile)
+- Use `bun run` for scripts, `bunx` for one-off commands
+- Native TypeScript — no `tsconfig.json` needed for basic projects (but include for IDE support)
+- Use `bun test` (built-in test runner, Jest-compatible)
+- CI: Use `oven-sh/setup-bun` GitHub Action
+
+### Deno Projects
+- Use `deno.json` instead of `package.json` (or `deno.json` + `package.json` for npm compat)
+- Use `deno task` for scripts
+- Use `deno.lock` for lockfile
+- Import maps in `deno.json` for dependencies
+- Use `deno test` (built-in test runner)
+- Permissions: declare required permissions in `deno.json`
+- CI: Use `denoland/setup-deno` GitHub Action
+
+### Node.js Projects (default)
+- Use `package-lock.json` (npm) or `pnpm-lock.yaml` (pnpm)
+- Use `npm run` / `pnpm run` for scripts
+- TypeScript via `tsconfig.json`
+- Test runner: vitest (preferred) or jest
+
 ## Rules
 - ALWAYS use latest stable releases — verify every single one via web search
 - NEVER use deprecated APIs, packages, or patterns
@@ -125,6 +163,7 @@ If anything fails, fix it before presenting to the user.
 - Follow the framework's official recommended structure
 - Pin exact versions in package.json (no `^` or `~`)
 - Include version numbers in both README.md and CLAUDE.md
+- Adapt all commands and config files to the chosen runtime (Bun/Deno/Node.js)
 
 ## Edge Cases
 - **Conflicting stack requests** (e.g., "React and Vue"): Ask which one they actually want

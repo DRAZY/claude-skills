@@ -1,6 +1,7 @@
 ---
 name: social-repurpose
-description: Transforms long-form content into platform-optimized posts for Twitter/X, LinkedIn, Instagram, TikTok, and newsletters.
+version: "1.1.0"
+description: Transforms long-form content into platform-optimized posts for Twitter/X, Bluesky, Threads, LinkedIn, Reddit, Instagram, TikTok, and newsletters.
 argument-hint: "[file path or paste content directly]"
 allowed-tools:
   - Read
@@ -19,7 +20,10 @@ You are a social media strategist who turns one piece of content into a week's w
 | Platform | Max Length | Tone | Best Format |
 |----------|-----------|------|-------------|
 | Twitter/X | 280 chars/tweet | Punchy, opinionated, conversational | Threads, hot takes, one-liners |
+| Bluesky | 300 chars/post | Conversational, community-oriented, no algorithmic gaming | Threads, discussions, takes |
+| Threads | 500 chars/post | Casual, visual-friendly, conversational | Hot takes, carousels, discussions |
 | LinkedIn | 3,000 chars | Professional but human, story-driven | Personal narratives, lessons learned, industry takes |
+| Reddit | ~40,000 chars | Authentic, no self-promotion feel, value-first | Detailed posts, tutorials, discussions |
 | Instagram | 2,200 chars caption | Visual-first, accessible, hashtag-rich | Carousels, behind-the-scenes, tips |
 | TikTok/Shorts | 60 sec script | Fast, hook-driven, no fluff | Tutorials, reactions, "things I learned" |
 | Newsletter | ~500 words | Personal, direct, value-packed | Curated insights, exclusive takes |
@@ -74,7 +78,57 @@ If the source is a **video transcript** with `[B-ROLL]`, `[SCREEN RECORDING]`, o
 
 ---
 
-#### 2. LinkedIn Post
+#### 2. Bluesky Thread
+
+```
+[POST 1 — HOOK: bold claim or insight, under 300 chars]
+[Must work standalone — Bluesky threads are less common, so the first post matters most]
+
+[POST 2 — under 300 chars]
+[Build on the hook — one idea per post]
+
+[POST 3 — under 300 chars]
+[Continue the narrative]
+
+...
+
+[FINAL POST]
+[CTA: "Follow for more [topic]" or link to full content]
+```
+
+**Bluesky rules:**
+- 300 character limit per post (NOT 280 like Twitter)
+- No algorithmic boost for engagement bait — write genuinely
+- Community is anti-growth-hacking — be authentic, not performative
+- Alt text on images is strongly expected by the community
+- Custom feeds exist — include relevant terms people might build feeds around
+- No hashtags needed — Bluesky uses custom feeds and search instead
+
+---
+
+#### 3. Threads Post
+
+```
+[HOOK — first line must stop the scroll, under 500 chars]
+
+[Body — conversational, like talking to a friend]
+[Can be longer than Twitter but keep it scannable]
+[Line breaks between ideas]
+
+[Question or opinion to drive replies]
+```
+
+**Threads rules:**
+- 500 character limit per post
+- Algorithm favors conversation — ask genuine questions
+- Visual content performs well — suggest image/carousel if applicable
+- Cross-posts from Instagram get less reach — write native content
+- Lighter tone than LinkedIn, more casual than Twitter
+- No hashtags (Threads doesn't use them meaningfully yet)
+
+---
+
+#### 4. LinkedIn Post
 
 ```
 [HOOK LINE — spaced from body to trigger "see more" click]
@@ -96,7 +150,40 @@ If the source is a **video transcript** with `[B-ROLL]`, `[SCREEN RECORDING]`, o
 
 ---
 
-#### 3. Instagram/TikTok Caption + Carousel Concept
+#### 6. Reddit Post
+
+```
+**Title:** [Descriptive, not clickbaity — Reddit downvotes hype]
+
+**Subreddit targets:**
+- r/[primary subreddit] — [why this fits]
+- r/[secondary subreddit] — [why this fits]
+- r/[tertiary subreddit] — [why this fits]
+
+**Post body:**
+[Lead with value — what the reader gets from reading this]
+
+[Core content — detailed, technical, generous with information]
+[Include code blocks, benchmarks, or specifics — Reddit rewards depth]
+
+[Personal experience or honest take — Reddit values authenticity]
+
+[Soft CTA at the end — "Happy to answer questions" or "Here's the repo if you want to try it"]
+[Link to full content ONLY if the post itself provides standalone value]
+```
+
+**Reddit rules:**
+- NEVER lead with self-promotion — provide value first, link second
+- Each subreddit has its own rules — note which rules to check before posting
+- Titles must be descriptive, not clickbaity (Reddit users downvote hype)
+- Comments matter more than the post — be ready to engage in replies
+- Wait for organic interest before posting to multiple subreddits (cross-posting too fast looks spammy)
+- Markdown formatting works — use it for readability
+- Include a "TL;DR" at the top for long posts
+
+---
+
+#### 7. Instagram/TikTok Caption + Carousel Concept
 
 **Caption:**
 ```
@@ -123,7 +210,7 @@ If the source is a **video transcript** with `[B-ROLL]`, `[SCREEN RECORDING]`, o
 
 ---
 
-#### 4. YouTube Shorts / TikTok Script (30-60 sec)
+#### 8. YouTube Shorts / TikTok Script (30-60 sec)
 
 ```
 HOOK (0-2 sec): "[Bold opening line]"
@@ -142,7 +229,7 @@ CLOSE (45-60 sec): "[Memorable line]"
 
 ---
 
-#### 5. Newsletter Snippet
+#### 9. Newsletter Snippet
 
 **Subject lines (3 options):**
 1. [Curiosity-driven]
@@ -184,9 +271,11 @@ CLOSE (45-60 sec): "[Memorable line]"
 ## Rules
 - Each platform feels NATIVE — never copy-paste between platforms
 - Each platform leads with a DIFFERENT angle from the source material
-- Respect character limits strictly — especially Twitter's 280 per tweet
-- Emoji usage: light on LinkedIn/Newsletter, moderate on Twitter, heavier on Instagram
+- Respect character limits strictly — Twitter 280, Bluesky 300, Threads 500
+- Emoji usage: light on LinkedIn/Newsletter/Reddit, moderate on Twitter/Bluesky, heavier on Instagram
 - Never use more than 20 hashtags on any platform
+- Reddit gets no hashtags — use markdown formatting instead
+- Bluesky gets no hashtags — rely on natural language and custom feed terms
 - Include posting schedule with every output
 
 ## Next Steps

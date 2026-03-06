@@ -1,6 +1,6 @@
 # Claude Code Custom Skills
 
-A production-grade collection of 13 custom [Claude Code](https://claude.ai/claude-code) skills for content creation, AI development, security auditing, defensive research, community management, and AI framework expertise.
+A production-grade collection of 15 custom [Claude Code](https://claude.ai/claude-code) skills for content creation, AI development, security auditing, defensive research, community management, and AI framework expertise.
 
 These skills use advanced Claude Code features including `context: fork` for isolated execution, `allowed-tools` for precise tool access, dynamic context injection (`!`command``), skill chaining, and structured output templates.
 
@@ -25,16 +25,18 @@ git clone https://github.com/DRAZY/claude-skills.git ~/.claude/skills
 
 | Skill | Category | Key Features |
 |---|---|---|
-| [`/content-plan`](#content-plan) | Content | WebSearch for trends, exact table format, skill chaining, timezone-aware |
-| [`/script-writer`](#script-writer) | Content | 4 formats, word count targets, B-roll cues, fact verification |
-| [`/seo-optimize`](#seo-optimize) | Content | Before/after comparison, keyword research, competition analysis |
-| [`/social-repurpose`](#social-repurpose) | Content | 5 platforms, hard character limits, de-duplication, posting schedule |
-| [`/tool-review`](#tool-review) | Content | Forked context, rating scale anchors, competitor tables, privacy audit |
-| [`/project-ideas`](#project-ideas) | Development | Diversity requirements, similar project check, quick-start commands |
-| [`/app-scaffold`](#app-scaffold) | Development | Latest version verification, CI/CD, security defaults, post-build validation |
+| [`/content-plan`](#content-plan) | Content | WebSearch for trends, 9 platforms (incl. Bluesky/Threads/Mastodon), analytics-informed planning, skill chaining |
+| [`/script-writer`](#script-writer) | Content | 6 formats (youtube, short, blog, thread, podcast, newsletter), code tutorial variant, word count targets |
+| [`/seo-optimize`](#seo-optimize) | Content | 4 platforms (youtube, blog, podcast, github), before/after comparison, keyword research, volume disclaimers |
+| [`/social-repurpose`](#social-repurpose) | Content | 8 platforms (incl. Bluesky, Threads, Reddit), hard character limits, de-duplication, posting schedule |
+| [`/content-review`](#content-review) | Content | Performance analytics ingestion, pattern analysis, benchmarks, actionable recommendations |
+| [`/tool-review`](#tool-review) | Content | Forked context, rating scale anchors, competitor tables, accessibility assessment, privacy audit |
+| [`/project-ideas`](#project-ideas) | Development | Diversity requirements, existing project detection, similar project check, quick-start commands |
+| [`/app-scaffold`](#app-scaffold) | Development | Node/Bun/Deno runtime support, latest version verification, CI/CD, security defaults, post-build validation |
+| [`/claude-api`](#claude-api) | Development | Claude API/SDK patterns, streaming, tool use, prompt caching, batch API, agent patterns |
 | [`/secure-review`](#secure-review) | Security | Forked context, 3-layer audit, Ghost + manual, confidence levels |
 | [`/stack-check`](#stack-check) | Security | Forked context, health score, license audit, exact upgrade commands |
-| [`/community-manager`](#community-manager) | Community | 7 focus areas, competitor intel, templates, metrics dashboards |
+| [`/community-manager`](#community-manager) | Community | 7 focus areas, parameterizable community profile, competitor intel, templates, metrics dashboards |
 | [`/defense-analyst`](#defense-analyst) | Security | macOS binary analysis, CVSS scoring, defensive tools, vuln reports |
 | [`/red-team-scaffold`](#red-team-scaffold) | Security | GenAI red team infra — exfil server, vulnerable MCP, sandbox |
 | [`/mastra-expert`](#mastra-expert) | Development | Mastra AI framework — agents, workflows, memory, RAG, MCP, voice, evals, deployment |
@@ -60,7 +62,7 @@ These skills leverage Claude Code's full capabilities:
 
 ### `/content-plan`
 
-Generates a 7-day content calendar with web-searched trending topics.
+Generates a 7-day content calendar with web-searched trending topics. Supports 9 platforms.
 
 ```
 /content-plan AI tools and workflows
@@ -71,31 +73,36 @@ Generates a 7-day content calendar with web-searched trending topics.
 - Trending topic research via WebSearch (with source dates)
 - Calendar table with exact format (day, platform, type, title, production time)
 - Detailed breakdown per day: hook, key points, CTA, repurpose chain
-- Posting time recommendations by platform (ET timezone)
+- Posting time recommendations for 9 platforms: YouTube, Twitter/X, LinkedIn, Bluesky, Threads, Mastodon, TikTok, Blog, Newsletter
+- Performance-informed planning when past analytics data is available
 - Weekly theme summary + quick win + hero content identification
 - Skill chain: suggests `/script-writer` → `/seo-optimize` → `/social-repurpose`
 
-**Handles:** No input (asks + suggests trending topics), too-broad topics (narrows with 3 angles), multiple topics (mixed calendar), weekend exclusions.
+**Handles:** No input (asks + suggests trending topics), too-broad topics (narrows with 3 angles), multiple topics (mixed calendar), weekend exclusions, past performance data.
 
 ---
 
 ### `/script-writer`
 
-Creates ready-to-use scripts with word count targets and production cues.
+Creates ready-to-use scripts with word count targets and production cues. Now supports 6 formats.
 
 ```
 /script-writer Building an AI Agent youtube
 /script-writer Top 5 AI Tools 2026 short
 /script-writer Prompt Engineering Guide blog
 /script-writer Claude Code Tips thread
+/script-writer AI Security Trends podcast
+/script-writer Weekly AI Roundup newsletter
 ```
 
 | Format | Output Details |
 |---|---|
 | `youtube` | 5-15 min script (~150 words/min), timestamps, `[B-ROLL]`/`[SCREEN RECORDING]` cues, 3 thumbnail concepts, sponsor section |
 | `short` | 30-60 sec TikTok/Reels/Shorts with text overlay cues |
-| `blog` | 800-1,500 words with H2 structure, meta description, code snippet suggestions |
+| `blog` | 800-1,500 words with H2 structure, meta description, code snippet suggestions. Code tutorial variant with step-by-step structure, prerequisites, expected output, and troubleshooting |
 | `thread` | 8-12 tweets, each under 280 chars, standalone-worthy, with pinned reply |
+| `podcast` | 20-45 min solo or interview format, segment structure, guest questions, show notes, audiogram candidates |
+| `newsletter` | 500-1,000 word standalone newsletter with subject lines, preview text, quick hits, personal note |
 
 **Voice:** Conversational, direct, energetic — never corporate. Includes example sentences showing target tone. Facts verified via WebSearch.
 
@@ -103,11 +110,13 @@ Creates ready-to-use scripts with word count targets and production cues.
 
 ### `/seo-optimize`
 
-Optimizes content for search with before/after comparisons and competition analysis.
+Optimizes content for search with before/after comparisons and competition analysis. Supports 4 platforms.
 
 ```
 /seo-optimize "Building an AI App with Claude" youtube
 /seo-optimize "Getting Started with Prompt Engineering" blog
+/seo-optimize "AI Security Weekly" podcast
+/seo-optimize my-awesome-tool github
 ```
 
 **What's included:**
@@ -115,16 +124,18 @@ Optimizes content for search with before/after comparisons and competition analy
 - 3 optimized title variants (under 60 chars, keyword front-loaded)
 - Full description template with timestamps and links sections
 - 15-20 tags (exact match, long-tail, competitor names, misspellings)
-- Keyword analysis table (volume, competition, recommendation)
+- Keyword analysis table (volume, competition, recommendation) with honest disclaimer about estimation accuracy
 - Content gap analysis (what top-ranking content misses)
 - Saturation check with color-coded assessment
+- **Podcast SEO:** Episode titles, show descriptions, Apple Podcasts tags, Spotify topics, transcript SEO, directory submissions
+- **GitHub SEO:** Repo naming, README structure, topics/tags, social preview images, discoverability tips
 - Validation tool suggestions (TubeBuddy, vidIQ, Ahrefs)
 
 ---
 
 ### `/social-repurpose`
 
-Transforms one piece of content into native posts for 5 platforms.
+Transforms one piece of content into native posts for 8 platforms.
 
 ```
 /social-repurpose ./blog-post.md
@@ -136,12 +147,35 @@ Transforms one piece of content into native posts for 5 platforms.
 | Platform | Limit | What You Get |
 |---|---|---|
 | Twitter/X | 280/tweet | 8-12 tweet thread + pinned reply |
+| Bluesky | 300/post | Thread with authentic, community-oriented tone — no hashtags |
+| Threads | 500/post | Casual, conversation-driving posts — no hashtags |
 | LinkedIn | 3,000 chars | Hook-first post with professional tone |
+| Reddit | ~40,000 chars | Value-first post with subreddit targeting and anti-promotional norms |
 | Instagram | 2,200 chars | Caption + carousel concept + hashtags |
 | TikTok/Shorts | 60 sec | Script with text overlays |
 | Newsletter | ~500 words | 3 subject lines + preview text + body |
 
 **Key feature:** De-duplication rule — each platform leads with a DIFFERENT angle from the source material. Includes staggered posting schedule with dates and times.
+
+---
+
+### `/content-review`
+
+Analyzes content performance data and generates actionable insights. Accepts CSV files, pasted metrics, or screenshots.
+
+```
+/content-review [paste analytics data]
+/content-review ~/analytics/youtube-march.csv
+```
+
+**What's included:**
+- Content performance table and platform-level summary
+- Top performer analysis — what worked and why, with replication plans
+- Underperformer analysis — what failed and whether to fix or kill
+- Pattern analysis: best content type, platform, posting day, time, and length
+- Industry benchmark comparison
+- Prioritized actionable recommendations (double down, fix, kill, experiment)
+- Next-week content brief informed by the analysis
 
 ---
 
@@ -160,7 +194,8 @@ Researches AI tools and generates structured review outlines. Runs in a forked c
 - Feature ratings (Game-changer / Solid / Meh / Broken)
 - Competitor comparison table
 - Rating with defined scale anchors (9-10: exceptional, 7-8: strong, 5-6: situational, etc.)
-- Hands-on demo plan with wow-factor ratings
+- Hands-on demo plan with wow-factor ratings and quick test checklist
+- Accessibility assessment (keyboard nav, screen reader, color contrast, mobile, i18n)
 - Video production kit (3 titles, thumbnail, talking points, demo sequence)
 - Data privacy assessment (storage, training, compliance, incidents)
 
@@ -180,18 +215,19 @@ Generates 5 buildable project ideas with diversity requirements.
 
 **Per idea:** Name, description, verified tech stack, features, APIs (with pricing), difficulty, build time, learning outcomes, content angle (episode count, wow factor), monetization potential, and **quick-start command** (`/app-scaffold [description]`).
 
-**Diversity enforced:** At least 3 different stacks, 2 difficulty levels, 1 weekend project, 1 ambitious series project. Checks for similar existing projects via web search.
+**Diversity enforced:** At least 3 different stacks, 2 difficulty levels, 1 weekend project, 1 ambitious series project. Checks for similar existing projects via web search. Detects existing projects in your workspace and GitHub repos to avoid duplicates and suggest complementary builds.
 
 ---
 
 ### `/app-scaffold`
 
-Scaffolds production-ready projects with verified latest versions. Manual-invoke only (`disable-model-invocation: true`) since it creates files and runs commands.
+Scaffolds production-ready projects with verified latest versions. Supports Node.js, Bun, and Deno runtimes with automatic detection. Manual-invoke only (`disable-model-invocation: true`) since it creates files and runs commands.
 
 ```
 /app-scaffold AI chatbot with Next.js and Supabase
 /app-scaffold SaaS dashboard with Stripe billing
 /app-scaffold CLI tool in Rust
+/app-scaffold API server with Bun and Hono
 ```
 
 **What's created:**
@@ -204,6 +240,28 @@ Scaffolds production-ready projects with verified latest versions. Manual-invoke
 - Security defaults: CORS, input validation (zod/joi/pydantic), CSP headers, auth boilerplate
 
 **Post-scaffold validation:** Runs `install`, `build`, and `test` to verify the scaffold actually works before presenting it.
+
+---
+
+### `/claude-api`
+
+Build applications with the Claude API, Anthropic SDKs, and Agent SDK. Auto-triggers when code imports `anthropic` or `@anthropic-ai/sdk`.
+
+```
+/claude-api Set up streaming chat with tool use
+/claude-api Add prompt caching to reduce costs
+/claude-api Build an agent loop with tool calling
+/claude-api Use the batch API for bulk processing
+```
+
+**What's included:**
+- SDK setup patterns (TypeScript + Python)
+- Core API patterns: messages, streaming, tool use, vision, prompt caching, extended thinking, batch API
+- Model selection guide with cost/speed tradeoffs
+- Cost optimization strategies (caching, batching, model routing)
+- Error handling with typed exceptions
+- Agent tool loop patterns (manual and SDK-based)
+- Latest SDK version verification via web search
 
 ---
 
@@ -319,7 +377,7 @@ Scaffolds GenAI red team testing infrastructure. Manual-invoke only.
 
 ### `/community-manager`
 
-Comprehensive community management for the [0DIN.ai](https://0din.ai) GenAI bug bounty platform.
+Community management assistant. Default profile: [0DIN.ai](https://0din.ai) GenAI bug bounty. Supports any community via `--community` flag.
 
 ```
 /community-manager                                    # Weekly action plan
@@ -328,6 +386,7 @@ Comprehensive community management for the [0DIN.ai](https://0din.ai) GenAI bug 
 /community-manager re-engagement campaign             # Engagement tactics
 /community-manager monthly metrics report template    # Reporting
 /community-manager what is HackerOne doing for community  # Competitor intel
+/community-manager --community "Rust Discord — 2k devs"  # Custom community
 ```
 
 **7 focus areas:**
@@ -384,7 +443,7 @@ These skills are designed to chain together:
 ```
 /project-ideas          → Pick what to build
     ↓
-/app-scaffold           → Set up the project
+/app-scaffold           → Set up the project (Node/Bun/Deno)
     ↓
 /stack-check            → Verify all versions current
     ↓
@@ -392,24 +451,39 @@ These skills are designed to chain together:
     ↓
 /secure-review          → Audit before shipping
     ↓
-/script-writer          → Create content about the build
+/script-writer          → Create content (video, blog, podcast, newsletter)
     ↓
-/seo-optimize           → Optimize for discovery
+/seo-optimize           → Optimize for discovery (YouTube, blog, podcast, GitHub)
     ↓
-/social-repurpose       → Distribute everywhere
+/social-repurpose       → Distribute everywhere (8 platforms)
     ↓
 /content-plan           → Plan next week's content
+    ↓
+/content-review         → Analyze performance → feed back into planning
+```
+
+For Claude API development:
+```
+/claude-api             → Build with Claude API/SDK
+    ↓
+/app-scaffold           → Set up the project structure
+    ↓
+/secure-review          → Audit API key handling and data exposure
+    ↓
+/stack-check            → Verify SDK version is current
 ```
 
 For community management:
 ```
-/community-manager      → Plan engagement activities
+/community-manager      → Plan engagement activities (any community)
     ↓
 /content-plan           → Schedule community content
     ↓
 /script-writer          → Script event promos and recaps
     ↓
 /social-repurpose       → Distribute across platforms
+    ↓
+/content-review         → Measure engagement → refine strategy
 ```
 
 For Mastra AI framework development:
@@ -436,6 +510,21 @@ For defensive security research:
 /stack-check            → Verify all dependency versions
     ↓
 /script-writer          → Create content about the research
+```
+
+For content performance optimization:
+```
+/content-review         → Analyze what's working
+    ↓
+/content-plan           → Plan based on performance data
+    ↓
+/script-writer          → Script in top-performing formats
+    ↓
+/seo-optimize           → Optimize for discovery
+    ↓
+/social-repurpose       → Distribute to winning platforms
+    ↓
+/content-review         → Measure again → continuous improvement
 ```
 
 ---
