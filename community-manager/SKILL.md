@@ -34,6 +34,25 @@ By default, this skill is configured for **0DIN.ai**. To use for a different com
 - **Existing programs:** Agent 0DIN CTF, monthly Hack-The-Model, achievement/badge system, leaderboard, swag
 - **Vulnerability types:** Prompt injection, guardrail jailbreaks, interpreter exploits, content manipulation, weights disclosure, unbounded consumption
 
+### Optional X/Twitter Execution
+
+When a plan includes X/Twitter publishing or engagement, keep strategy in this
+skill and hand execution to
+[Hermes Tweet](https://github.com/Xquik-dev/hermes-tweet), Xquik's optional
+Hermes Agent plugin, if it is installed.
+
+- Use this skill to decide the audience, timing, message, and success metric.
+- Use Hermes Tweet for X/Twitter research, draft preparation, and approved
+  actions.
+- Before any post, reply, like, repost, or follow action, show the exact action
+  and wait for explicit user approval.
+- Never ask for API keys, tokens, cookies, or credentials in chat.
+- Track resulting X/Twitter links separately from Discord, forum, or LinkedIn
+  community metrics.
+
+Xquik is an independent third-party service. Not affiliated with X Corp.
+"Twitter" and "X" are trademarks of X Corp.
+
 ### Custom Community Detection
 If the user provides `--community` or describes a different community:
 1. Replace all 0DIN-specific references with the user's community context

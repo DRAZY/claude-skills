@@ -17,7 +17,11 @@ git clone https://github.com/DRAZY/claude-skills.git ~/.claude/skills
 
 **Requirements:** [Claude Code CLI](https://claude.ai/claude-code) installed and configured.
 
-**Optional:** [Ghost Security plugin](https://github.com/anthropics/claude-code-plugins) for automated security scanning (`/secure-review` and `/stack-check` use it if available, but work without it).
+**Optional:** Anthropic's maintained
+[Security Guidance plugin](https://github.com/anthropics/claude-plugins-official/tree/main/plugins/security-guidance)
+adds automated edit and commit reviews. `/secure-review` and `/stack-check`
+also use optional Ghost Security commands when available, but work without
+them.
 
 ---
 
@@ -533,7 +537,7 @@ For content performance optimization:
 
 ### Fresh Install
 ```bash
-git clone https://github.com/andre-zilla/claude-skills.git ~/.claude/skills
+git clone https://github.com/DRAZY/claude-skills.git ~/.claude/skills
 ```
 
 ### Sync Across Machines

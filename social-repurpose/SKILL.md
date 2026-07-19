@@ -76,6 +76,19 @@ If the source is a **video transcript** with `[B-ROLL]`, `[SCREEN RECORDING]`, o
 - Use line breaks, not walls of text
 - Include 2-3 🔥 or 💡 emoji max — don't overdo it
 
+**Optional Hermes Tweet handoff:**
+- If [Hermes Tweet](https://github.com/Xquik-dev/hermes-tweet), Xquik's
+  optional Hermes Agent plugin, is installed, use it for X/Twitter research,
+  draft staging, and approved posting.
+- Keep this skill responsible for content adaptation and channel strategy.
+- Before publishing, replying, liking, reposting, or following on X/Twitter,
+  show the exact action and wait for explicit user approval.
+- Never ask for API keys, tokens, cookies, or credentials in chat.
+- Record posted X/Twitter URLs separately from the cross-platform content plan.
+
+Xquik is an independent third-party service. Not affiliated with X Corp.
+"Twitter" and "X" are trademarks of X Corp.
+
 ---
 
 #### 2. Bluesky Thread
