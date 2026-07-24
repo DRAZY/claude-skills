@@ -150,7 +150,7 @@ If the source is a **video transcript** with `[B-ROLL]`, `[SCREEN RECORDING]`, o
 
 ---
 
-#### 6. Reddit Post
+#### 5. Reddit Post
 
 ```
 **Title:** [Descriptive, not clickbaity — Reddit downvotes hype]
@@ -183,7 +183,7 @@ If the source is a **video transcript** with `[B-ROLL]`, `[SCREEN RECORDING]`, o
 
 ---
 
-#### 7. Instagram/TikTok Caption + Carousel Concept
+#### 6. Instagram/TikTok Caption + Carousel Concept
 
 **Caption:**
 ```
@@ -210,7 +210,7 @@ If the source is a **video transcript** with `[B-ROLL]`, `[SCREEN RECORDING]`, o
 
 ---
 
-#### 8. YouTube Shorts / TikTok Script (30-60 sec)
+#### 7. YouTube Shorts / TikTok Script (30-60 sec)
 
 ```
 HOOK (0-2 sec): "[Bold opening line]"
@@ -229,7 +229,7 @@ CLOSE (45-60 sec): "[Memorable line]"
 
 ---
 
-#### 9. Newsletter Snippet
+#### 8. Newsletter Snippet
 
 **Subject lines (3 options):**
 1. [Curiosity-driven]

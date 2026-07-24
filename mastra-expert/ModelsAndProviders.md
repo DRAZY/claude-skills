@@ -5,7 +5,7 @@
 ```typescript
 // Direct: "provider/model-name"
 model: "openai/gpt-5.1"
-model: "anthropic/claude-4-5-sonnet"
+model: "anthropic/claude-opus-4-8"
 model: "google/gemini-2.5-flash"
 model: "xai/grok-4"
 
@@ -46,7 +46,7 @@ const agent = new Agent({
   id: "resilient-agent",
   model: [
     { model: "openai/gpt-5", maxRetries: 3 },
-    { model: "anthropic/claude-4-5-sonnet", maxRetries: 2 },
+    { model: "anthropic/claude-opus-4-8", maxRetries: 2 },
     { model: "google/gemini-2.5-pro", maxRetries: 2 },
   ],
 });
@@ -148,7 +148,7 @@ const { embeddings } = await embedMany({
 | Provider | Env Variable | Example Model |
 |----------|-------------|---------------|
 | OpenAI | `OPENAI_API_KEY` | `openai/gpt-5.1` |
-| Anthropic | `ANTHROPIC_API_KEY` | `anthropic/claude-4-5-sonnet` |
+| Anthropic | `ANTHROPIC_API_KEY` | `anthropic/claude-opus-4-8` |
 | Google | `GOOGLE_GENERATIVE_AI_API_KEY` | `google/gemini-2.5-flash` |
 | xAI | `XAI_API_KEY` | `xai/grok-4` |
 | Mistral | `MISTRAL_API_KEY` | `mistral/mistral-large-latest` |
