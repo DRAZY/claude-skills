@@ -1,7 +1,7 @@
 ---
 name: app-scaffold
-version: "1.1.0"
-description: Scaffolds a new project with latest stable versions, security defaults, CLAUDE.md, and clean folder structure. Supports Node.js, Bun, and Deno runtimes. Always verifies latest versions via web search.
+version: "1.2.0"
+description: Scaffolds a production-ready project — verified latest versions, security defaults, CI, tests, and CLAUDE.md — on Node, Bun, or Deno, then runs install/build/test to prove it works. Manual-invoke only — it writes files and runs commands. USE WHEN scaffold, new project, set up a project, bootstrap, start a new app, initialize, project skeleton, spin up, boilerplate. NOT FOR choosing what to build (use project-ideas) or auditing an existing project (use stack-check).
 argument-hint: "[app description and optional stack]"
 allowed-tools:
   - WebSearch

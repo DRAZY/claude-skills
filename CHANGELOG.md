@@ -2,6 +2,26 @@
 
 All notable changes to this skill collection are documented here.
 
+## [1.2.0] - 2026-07-24
+
+Description-discipline pass. Claude auto-invokes a skill from its `description`
+field alone, so every one now states what it does, the trigger phrases a user
+would actually type (`USE WHEN ...`), and which neighbouring skill owns the
+adjacent job (`NOT FOR ... (use other-skill)`). This is the single biggest
+reliability improvement to auto-invocation, and it disambiguates the overlapping
+content skills (content-plan vs script-writer vs social-repurpose vs
+seo-optimize vs content-review) and security skills (secure-review vs
+stack-check vs defense-analyst vs red-team-scaffold) from each other.
+
+### Changed
+- Rewrote the `description` frontmatter on all 15 skills to the `USE WHEN` /
+  `NOT FOR` contract. Every cross-reference points to a skill that exists; every
+  description stays under the 1024-character limit.
+- Minor version bump on all 15 skills (a description change alters
+  auto-invocation behaviour).
+- README "Creating Your Own" now documents the description contract, including
+  the YAML gotcha that a bare `: ` inside the value breaks parsing.
+
 ## [1.1.1] - 2026-07-24
 
 Correctness and repo-hygiene pass. No behavioral changes to skill logic.

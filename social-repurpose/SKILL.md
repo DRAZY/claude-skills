@@ -1,7 +1,7 @@
 ---
 name: social-repurpose
-version: "1.1.0"
-description: Transforms long-form content into platform-optimized posts for Twitter/X, Bluesky, Threads, LinkedIn, Reddit, Instagram, TikTok, and newsletters.
+version: "1.2.0"
+description: Transforms one long-form piece into native posts for X, Bluesky, Threads, LinkedIn, Reddit, Instagram, TikTok, and newsletters — each leading with a different angle, character limits enforced. USE WHEN repurpose, cross-post, turn this into posts, promote this, distribute, adapt for LinkedIn, make a thread from this, social posts from my blog, share this everywhere. NOT FOR writing original long-form content (use script-writer) or scheduling a week of new content (use content-plan).
 argument-hint: "[file path or paste content directly]"
 allowed-tools:
   - Read

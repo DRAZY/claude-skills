@@ -1,7 +1,7 @@
 ---
 name: defense-analyst
-version: "1.0.0"
-description: Defensive security research analyst for macOS binary analysis. Generates vulnerability reports, CVSS assessments, defensive monitoring tools, responsible disclosure docs, and research organization. Strictly defensive — never creates offensive exploits.
+version: "1.1.0"
+description: Defensive macOS binary and application security analysis — vulnerability reports with full CVSS vectors, detection tooling, responsible-disclosure documents, and research indexing across many findings. Strictly defensive — builds detection, never exploitation. Manual-invoke only. USE WHEN binary analysis, disassembly, Mach-O, dylib, entitlements, code signature, CVSS score, vulnerability report, disclosure report, detection script, DYLD injection, IPC security, otool, codesign. NOT FOR web application audits (use secure-review) or building test infrastructure (use red-team-scaffold).
 argument-hint: "[analysis task, file path, or question]"
 allowed-tools:
   - Bash

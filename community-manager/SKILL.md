@@ -1,7 +1,7 @@
 ---
 name: community-manager
-version: "1.1.0"
-description: Community management assistant — engagement strategies, blog ideas, event plans, outreach, recognition campaigns, metrics dashboards, and communication templates. Default profile is 0DIN.ai Bug Bounty, but supports any community via --community flag.
+version: "1.2.0"
+description: Community management for developer, researcher, and creator communities — engagement campaigns, events, onboarding funnels, recognition programs, comms templates, and metrics dashboards. Adapts to any community via --community. USE WHEN community, engagement, members are quiet, plan an event, CTF, AMA, workshop, onboarding, retention, re-engagement, recognition, leaderboard, community metrics, Discord, researcher outreach. NOT FOR general content scheduling (use content-plan) or writing the posts themselves (use script-writer).
 argument-hint: "[focus area or question] [optional: --community 'description']"
 allowed-tools:
   - WebSearch

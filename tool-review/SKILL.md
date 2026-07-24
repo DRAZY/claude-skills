@@ -1,7 +1,7 @@
 ---
 name: tool-review
-version: "1.1.0"
-description: Researches an AI tool or tech product and generates a structured review outline with features, pros/cons, competitors, accessibility assessment, and video talking points.
+version: "1.2.0"
+description: Researches an AI tool or tech product and produces a review outline — verified pricing, feature ratings, competitor table, accessibility and privacy assessment, and video talking points. USE WHEN review, tool review, is X worth it, compare tools, X vs Y, should I use, product research, hands-on plan, what does it cost, alternatives to. NOT FOR reviewing your own code (use secure-review) or auditing your dependencies (use stack-check).
 argument-hint: "[tool or product name]"
 allowed-tools:
   - WebSearch
