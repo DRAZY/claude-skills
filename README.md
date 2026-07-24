@@ -41,7 +41,7 @@ git clone https://github.com/DRAZY/claude-skills.git ~/.claude/skills
 | Skill | Category | Key Features |
 |---|---|---|
 | [`/content-plan`](#content-plan) | Content | WebSearch for trends, 9 platforms (incl. Bluesky/Threads/Mastodon), analytics-informed planning, **Producer loop mode** (never repeats a topic) |
-| [`/blog-writer`](#blog-writer) | Content | Universal long-form articles for any field — interviews you first, 5-stage process, 10 archetypes, length tiers, personal/work voice, anti-AI-slop edit pass |
+| [`/blog-writer`](#blog-writer) | Content | Universal long-form articles for any field — interviews you first, **matches your writing voice**, 7-stage process, 10 archetypes, skimmable web formatting, image cues, revision, anti-AI-slop edit |
 | [`/script-writer`](#script-writer) | Content | Scripts for youtube, short, thread, podcast, newsletter + quick blog skeletons; code tutorial variant, word-count targets |
 | [`/seo-optimize`](#seo-optimize) | Content | 4 platforms (youtube, blog, podcast, github), before/after comparison, keyword research, volume disclaimers |
 | [`/social-repurpose`](#social-repurpose) | Content | 8 platforms (incl. Bluesky, Threads, Reddit), hard character limits, de-duplication, posting schedule |
@@ -216,12 +216,15 @@ A **universal** long-form writer for **any field or topic** — tech, science, b
 
 **What's included:**
 - **Interviews you first** — hand it a topic or rough angle and it asks 3–6 sharp, topic-specific clarifying questions (the point, the audience, your hook, your first-hand experience, scope, where it'll live) before writing a word, so the post reflects *your* intent instead of assumptions. Say "just go" and it proceeds on its best read and states its assumptions.
-- A real **five-stage process**, not one pass: angle → research (with source verification) → outline → full draft → self-edit
+- **Matches your voice** — paste a paragraph of your past writing (or a style file) and it reads for sentence rhythm, vocabulary, how you open, how much you hedge, and your signature tics, then writes in *your* voice instead of a generic one. This is the difference between "a blog exists" and "it sounds like you wrote it."
+- A real **seven-stage process**, not one pass: interview → voice → research (source-verified) → outline → draft → edit → revise
 - **10 post archetypes**, each with a structure that fits the genre: tutorial, explainer, opinion, review, listicle, case study, news analysis, market/industry analysis, personal essay, and technical walkthrough — pick from them per post, not a lane you're locked into
 - **Length tiers** — short (~600–1,000) to definitive (4,000+); depth fits the topic, never padded to a count
 - **Personal vs work voice** — first-person and opinionated for your own site, measured and org-representing for a company/program blog
 - **Handles sensitive topics responsibly** — and the technical-walkthrough archetype has a defensive security sub-case (impact → detection → fix, no turnkey exploits) that hands off to `/prompt-injection-probe`, `/vuln-triage`, or `/disclosure-writer` when the underlying work lives there
 - **Anti-AI-slop edit pass** — strips "in today's landscape," corporate vocabulary, robotic three-part rhythm, restate-the-intro conclusions, and em-dash overuse
+- **Skimmable web formatting** — descriptive subheads, bolded key lines, TL;DR on long pieces, and `[IMAGE: …]` / `[DIAGRAM: …]` cues where a visual earns its place (plus a hero-image concept)
+- **First-class revision** — treats the first draft as a draft: invites feedback and revises surgically, keeping your voice locked across passes
 - Fact/stat/quote verification via WebSearch (never invents a source); specificity over adjectives
 - Clean CommonMark that pastes anywhere; adds MDX/frontmatter or platform conventions on request
 - Ships with word count + reading time, sources with dates, 3 headline options, and one honest "what I'd sharpen next" note
