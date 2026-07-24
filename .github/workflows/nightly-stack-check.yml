@@ -1,0 +1,128 @@
+# Monitor-archetype loop, running in CI.
+#
+# Demonstrates the full loop contract: gate -> produce artifact -> record delta
+# -> act only on change. The deterministic half needs no API key and no secrets,
+# so this workflow runs on a fresh clone as-is. The optional Claude step adds
+# narrative on top when ANTHROPIC_API_KEY is configured.
+#
+# Copy this into any project you want watched, and point PROJECT_DIR at it.
+
+name: nightly-stack-check
+
+on:
+  schedule:
+    - cron: "0 9 * * *" # 09:00 UTC daily
+  workflow_dispatch: # manual run button
+
+permissions:
+  contents: read
+  issues: write
+
+env:
+  SKILL: stack-check
+  PROJECT_DIR: .
+  STATE_DIR: .claude/skill-state
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      # State persists between runs via cache, so the loop has something to
+      # diff against. Alternatively, commit .claude/skill-state/ to the repo.
+      - name: Restore loop state
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.STATE_DIR }}
+          key: loop-state-${{ env.SKILL }}-${{ github.run_id }}
+          restore-keys: |
+            loop-state-${{ env.SKILL }}-
+
+      - name: Gate — stop conditions
+        id: gate
+        run: |
+          if node loop-runner/scripts/loop-state.mjs gate "$SKILL" --max-iterations 0; then
+            echo "proceed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "proceed=false" >> "$GITHUB_OUTPUT"
+            echo "Loop halted — skipping this cycle."
+          fi
+
+      - name: Produce artifact
+        if: steps.gate.outputs.proceed == 'true'
+        run: |
+          node stack-check/scripts/check-versions.mjs "$PROJECT_DIR" \
+            --out /tmp/stack-check.json --audit
+
+      - name: Record delta
+        if: steps.gate.outputs.proceed == 'true'
+        id: record
+        run: |
+          node loop-runner/scripts/loop-state.mjs record "$SKILL" /tmp/stack-check.json \
+            --escalate-on critical,high > /tmp/delta.json
+          cat /tmp/delta.json
+          {
+            echo "changed=$(jq -r '.changed' /tmp/delta.json)"
+            echo "escalate=$(jq -r '.escalate // "none"' /tmp/delta.json)"
+            echo "added=$(jq -r '.counts.added' /tmp/delta.json)"
+            echo "modified=$(jq -r '.counts.changed' /tmp/delta.json)"
+          } >> "$GITHUB_OUTPUT"
+
+      # The iron rule, enforced in CI: silence when nothing moved.
+      - name: No change — stay quiet
+        if: steps.record.outputs.changed == 'false'
+        run: echo "No dependency changes. Nothing to report."
+
+      - name: Open an issue on escalation
+        if: steps.record.outputs.escalate != 'none' && steps.record.outputs.escalate != ''
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const delta = JSON.parse(fs.readFileSync('/tmp/delta.json', 'utf8'));
+
+            const lines = [
+              `**Severity:** ${delta.escalate}`,
+              `**Run:** ${delta.run}`,
+              '',
+              `${delta.counts.added} added · ${delta.counts.changed} changed · ${delta.counts.removed} removed`,
+              '',
+              '| Package | Change | Fix |',
+              '|---|---|---|',
+            ];
+
+            for (const c of delta.changedItems ?? []) {
+              const change = Object.entries(c.changes)
+                .map(([field, v]) => `${field}: ${v.from} → ${v.to}`)
+                .join('<br>');
+              lines.push(`| \`${c.id}\` | ${change} | \`${c.item.upgrade ?? '—'}\` |`);
+            }
+            for (const item of delta.added ?? []) {
+              if (item.severity === 'critical' || item.severity === 'high') {
+                lines.push(`| \`${item.id}\` | new: ${item.status} | \`${item.upgrade ?? '—'}\` |`);
+              }
+            }
+
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `stack-check: ${delta.escalate} dependency finding (run ${delta.run})`,
+              body: lines.join('\n'),
+              labels: ['dependencies', 'automated'],
+            });
+
+      # Optional: a narrative summary from Claude. Skipped entirely when the
+      # secret is absent, so the workflow still works without an API key.
+      - name: Narrate the delta (optional)
+        if: steps.record.outputs.changed == 'true' && env.ANTHROPIC_API_KEY != ''
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          npm install -g @anthropic-ai/claude-code
+          claude -p "Read /tmp/delta.json. Following the Loop Mode section of stack-check/SKILL.md, \
+            report ONLY what changed — never the full dependency table. Lead with any escalation."

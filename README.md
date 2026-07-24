@@ -40,6 +40,103 @@ git clone https://github.com/DRAZY/claude-skills.git ~/.claude/skills
 | [`/defense-analyst`](#defense-analyst) | Security | macOS binary analysis, CVSS scoring, defensive tools, vuln reports |
 | [`/red-team-scaffold`](#red-team-scaffold) | Security | GenAI red team infra — exfil server, vulnerable MCP, sandbox |
 | [`/mastra-expert`](#mastra-expert) | Development | Mastra AI framework — agents, workflows, memory, RAG, MCP, voice, evals, deployment |
+| [`/loop-runner`](#continual-loops) | Automation | Runs loop-enabled skills continually — state, dedupe, deltas, stop conditions |
+
+---
+
+## Continual Loops
+
+Most skills are one-shot: you run them, you read the output, you decide what's next. Some are more useful running *continually* — watching a dependency tree for new CVEs, planning content every week without repeating itself, working a triage queue until it's empty.
+
+Naive looping breaks that. A skill re-run on a timer re-emits the same report forever, and a report you've seen five times is a report you stop reading.
+
+**The unit of value in a loop is the delta, not the report.** These skills implement that literally: a loop cycle that finds nothing new says one line and stops.
+
+### Three archetypes
+
+| Archetype | Question it answers | Pattern | Reference implementation |
+|---|---|---|---|
+| **Monitor** | "Has anything moved?" | fetch → diff vs last → report only the delta | `/stack-check` |
+| **Producer** | "What's next that I haven't done?" | read ledger → generate only NEW → remember | `/content-plan` |
+| **Pursuit** | "Is there anything left to do?" | work highest-priority item → repeat until dry | *(planned: `/vuln-triage`)* |
+
+### Try it
+
+The deterministic layer needs no API key — you can watch a loop go quiet yourself:
+
+```bash
+S=loop-runner/scripts/loop-state.mjs
+
+# Cycle 1 — establishes the baseline
+node stack-check/scripts/check-versions.mjs . --out /tmp/sc.json
+node $S record stack-check /tmp/sc.json          # changed: true (everything is "added")
+
+# Cycle 2 — nothing moved upstream
+node stack-check/scripts/check-versions.mjs . --out /tmp/sc.json
+node $S record stack-check /tmp/sc.json          # changed: false  <- the loop stays quiet
+
+node $S digest stack-check                       # roll up recent runs
+```
+
+### Safety: the loop allowlist
+
+Loop eligibility is **declared, not inferred**. Every skill carries a `loop:` frontmatter block:
+
+```yaml
+loop:
+  enabled: true
+  archetype: monitor
+  default-interval: 1d
+  max-iterations: 30
+  escalate-on: [critical, high]
+  writes: report-only      # report-only | files | infra
+```
+
+`writes` is the safety gate, and it isn't advisory. **Only `report-only` may run unattended.** Three skills are explicitly loop-excluded because they do more than write a report:
+
+| Skill | `writes` | Why it never loops |
+|---|---|---|
+| `app-scaffold` | `infra` | Writes project files, runs install/build |
+| `red-team-scaffold` | `infra` | Stands up Docker and intentionally vulnerable servers |
+| `defense-analyst` | `report-only` | Findings need human judgment; automated vuln analysis at interval manufactures false positives |
+
+An automation that can scaffold containers on a timer is exactly the pattern you'd flag in a security review — so the allowlist is explicit in the frontmatter rather than left to convention.
+
+### Stopping a loop
+
+```bash
+node $S halt stack-check "muted during the migration"   # halt flag
+touch .claude/skill-state/stack-check/STOP              # kill-switch file
+node $S gate stack-check --max-iterations 30            # hard cap (exit 3 = stop)
+```
+
+### Runners
+
+The skills don't schedule themselves — pick the layer that fits:
+
+| Runner | How | Best for |
+|---|---|---|
+| In-session | `/loop 30m /stack-check` | Watching something while you work |
+| Scheduled cloud | `/schedule` | Cadence that fires whether or not your laptop is open |
+| Repo-native CI | [`.github/workflows/nightly-stack-check.yml`](.github/workflows/nightly-stack-check.yml) | Zero-setup automation on a fresh clone |
+
+The bundled workflow runs the full contract — gate → artifact → delta → open an issue only on escalation — and its deterministic half needs no secrets.
+
+### State
+
+State lives in `.claude/skill-state/<skill>/` **in the project being watched**, not in this repo:
+
+```
+.claude/skill-state/stack-check/
+├── state.json      run counter, halt flag, no-change streak
+├── seen.json       dedupe ledger
+├── latest.json     diff baseline
+└── history/        timestamped artifacts + deltas
+```
+
+Commit non-sensitive state (version snapshots, used-topic ledgers) — it gives you history and makes CI loops work on a fresh clone. **Never commit security state.** Triage verdicts and finding hashes describe *unfixed* vulnerabilities; publishing them is a map of what's broken and unpatched. The repo `.gitignore` already excludes those paths.
+
+Full specification: [`loop-runner/references/LoopContract.md`](loop-runner/references/LoopContract.md) · Patterns and failure modes: [`loop-runner/references/Archetypes.md`](loop-runner/references/Archetypes.md)
 
 ---
 

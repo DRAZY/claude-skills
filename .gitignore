@@ -1,0 +1,39 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Build output
+dist/
+build/
+*.tsbuildinfo
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.idea/
+.vscode/
+*.swp
+
+# ---------------------------------------------------------------------------
+# Loop state
+# ---------------------------------------------------------------------------
+# Loop state lives in .claude/skill-state/<skill>/ in whatever project a skill
+# runs in. Non-sensitive state (version snapshots, used-topic ledgers) is safe
+# to commit — it gives you history and makes CI loops work on a fresh clone.
+#
+# Security-sensitive state is NOT. Triage verdicts, finding hashes, and
+# submission queues describe unfixed vulnerabilities; committing them
+# publishes a map of what is broken and not yet patched.
+.claude/skill-state/secure-review/
+.claude/skill-state/defense-analyst/
+.claude/skill-state/vuln-triage/
+.claude/skill-state/prompt-injection-probe/
+*.local.json
