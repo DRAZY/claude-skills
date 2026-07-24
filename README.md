@@ -1,6 +1,6 @@
 # Claude Code Custom Skills
 
-A production-grade collection of 15 custom [Claude Code](https://claude.ai/claude-code) skills for content creation, AI development, security auditing, defensive research, community management, and AI framework expertise.
+A production-grade collection of custom [Claude Code](https://claude.ai/claude-code) skills for content creation, AI development, AI security research, security auditing, defensive research, community management, and AI framework expertise — several of which run as continual, loop-aware workflows.
 
 These skills use advanced Claude Code features including `context: fork` for isolated execution, `allowed-tools` for precise tool access, dynamic context injection (`!`command``), skill chaining, and structured output templates.
 
@@ -40,6 +40,106 @@ git clone https://github.com/DRAZY/claude-skills.git ~/.claude/skills
 | [`/defense-analyst`](#defense-analyst) | Security | macOS binary analysis, CVSS scoring, defensive tools, vuln reports |
 | [`/red-team-scaffold`](#red-team-scaffold) | Security | GenAI red team infra — exfil server, vulnerable MCP, sandbox |
 | [`/mastra-expert`](#mastra-expert) | Development | Mastra AI framework — agents, workflows, memory, RAG, MCP, voice, evals, deployment |
+| [`/prompt-injection-probe`](#ai-security-research) | AI Security | Pursuit-loop injection/jailbreak/extraction battery against an authorized target, canary-scored |
+| [`/vuln-triage`](#ai-security-research) | AI Security | Pursuit-loop GenAI bug-bounty triage — validity, dedup, severity, CVSS, researcher response |
+| [`/disclosure-writer`](#ai-security-research) | AI Security | Coordinated responsible-disclosure package — report, timeline, remediation, optional CVE draft |
+| [`/loop-runner`](#continual-loops) | Automation | Runs loop-enabled skills continually — state, dedupe, deltas, stop conditions |
+
+---
+
+## Continual Loops
+
+Most skills are one-shot: you run them, you read the output, you decide what's next. Some are more useful running *continually* — watching a dependency tree for new CVEs, planning content every week without repeating itself, working a triage queue until it's empty.
+
+Naive looping breaks that. A skill re-run on a timer re-emits the same report forever, and a report you've seen five times is a report you stop reading.
+
+**The unit of value in a loop is the delta, not the report.** These skills implement that literally: a loop cycle that finds nothing new says one line and stops.
+
+### Three archetypes
+
+| Archetype | Question it answers | Pattern | Reference implementation |
+|---|---|---|---|
+| **Monitor** | "Has anything moved?" | fetch → diff vs last → report only the delta | `/stack-check` |
+| **Producer** | "What's next that I haven't done?" | read ledger → generate only NEW → remember | `/content-plan` |
+| **Pursuit** | "Is there anything left to do?" | work highest-priority item → repeat until dry | *(planned: `/vuln-triage`)* |
+
+### Try it
+
+The deterministic layer needs no API key — you can watch a loop go quiet yourself:
+
+```bash
+S=loop-runner/scripts/loop-state.mjs
+
+# Cycle 1 — establishes the baseline
+node stack-check/scripts/check-versions.mjs . --out /tmp/sc.json
+node $S record stack-check /tmp/sc.json          # changed: true (everything is "added")
+
+# Cycle 2 — nothing moved upstream
+node stack-check/scripts/check-versions.mjs . --out /tmp/sc.json
+node $S record stack-check /tmp/sc.json          # changed: false  <- the loop stays quiet
+
+node $S digest stack-check                       # roll up recent runs
+```
+
+### Safety: the loop allowlist
+
+Loop eligibility is **declared, not inferred**. Every skill carries a `loop:` frontmatter block:
+
+```yaml
+loop:
+  enabled: true
+  archetype: monitor
+  default-interval: 1d
+  max-iterations: 30
+  escalate-on: [critical, high]
+  writes: report-only      # report-only | files | infra
+```
+
+`writes` is the safety gate, and it isn't advisory. **Only `report-only` may run unattended.** Three skills are explicitly loop-excluded because they do more than write a report:
+
+| Skill | `writes` | Why it never loops |
+|---|---|---|
+| `app-scaffold` | `infra` | Writes project files, runs install/build |
+| `red-team-scaffold` | `infra` | Stands up Docker and intentionally vulnerable servers |
+| `defense-analyst` | `report-only` | Findings need human judgment; automated vuln analysis at interval manufactures false positives |
+
+An automation that can scaffold containers on a timer is exactly the pattern you'd flag in a security review — so the allowlist is explicit in the frontmatter rather than left to convention.
+
+### Stopping a loop
+
+```bash
+node $S halt stack-check "muted during the migration"   # halt flag
+touch .claude/skill-state/stack-check/STOP              # kill-switch file
+node $S gate stack-check --max-iterations 30            # hard cap (exit 3 = stop)
+```
+
+### Runners
+
+The skills don't schedule themselves — pick the layer that fits:
+
+| Runner | How | Best for |
+|---|---|---|
+| In-session | `/loop 30m /stack-check` | Watching something while you work |
+| Scheduled cloud | `/schedule` | Cadence that fires whether or not your laptop is open |
+| Repo-native CI | [`.github/workflows/nightly-stack-check.yml`](.github/workflows/nightly-stack-check.yml) | Zero-setup automation on a fresh clone |
+
+The bundled workflow runs the full contract — gate → artifact → delta → open an issue only on escalation — and its deterministic half needs no secrets.
+
+### State
+
+State lives in `.claude/skill-state/<skill>/` **in the project being watched**, not in this repo:
+
+```
+.claude/skill-state/stack-check/
+├── state.json      run counter, halt flag, no-change streak
+├── seen.json       dedupe ledger
+├── latest.json     diff baseline
+└── history/        timestamped artifacts + deltas
+```
+
+Commit non-sensitive state (version snapshots, used-topic ledgers) — it gives you history and makes CI loops work on a fresh clone. **Never commit security state.** Triage verdicts and finding hashes describe *unfixed* vulnerabilities; publishing them is a map of what's broken and unpatched. The repo `.gitignore` already excludes those paths.
+
+Full specification: [`loop-runner/references/LoopContract.md`](loop-runner/references/LoopContract.md) · Patterns and failure modes: [`loop-runner/references/Archetypes.md`](loop-runner/references/Archetypes.md)
 
 ---
 
@@ -405,6 +505,51 @@ Community management assistant. Default profile: [0DIN.ai](https://0din.ai) GenA
 
 ---
 
+## AI Security Research
+
+Three skills for the GenAI security lifecycle — find, triage, disclose. The first two are **Pursuit loops**: they work a backlog (a probe corpus, a submission queue) to a stated conclusion and never quit mid-backlog without reporting what remains. All three are strictly defensive and authorization-gated, and their loop state is gitignored because it describes unfixed vulnerabilities.
+
+### `/prompt-injection-probe`
+
+Stress-tests a system prompt or agent definition **you own or are authorized to test** with a structured battery of prompt-injection, indirect-injection, jailbreak, system-prompt-extraction, guardrail-bypass, encoding-smuggle, tool-abuse, multi-turn, and context-manipulation probes. Manual-invoke.
+
+```
+/prompt-injection-probe ./my-agent-system-prompt.md
+/prompt-injection-probe ./agent.md --focus extraction
+```
+
+- **Canary principle** — proves a guardrail failed with a benign marker, never by generating harmful content
+- **Pursuit loop** — each probe worked to a `HELD` / `BYPASSED` / `PARTIAL` verdict; converges when the corpus is exhausted
+- **Root-cause clustering** — 3 bypasses usually share 1 fix; the report leads with bypasses, never buries them
+- The "run the tests" counterpart to `/red-team-scaffold`'s "build the lab"
+
+### `/vuln-triage`
+
+Triages GenAI bug-bounty submissions one at a time — validity, duplicate-by-root-cause, severity, CVSS-adapted score, reproduction quality, category, and a drafted researcher response.
+
+```
+/vuln-triage ./submissions/
+/vuln-triage ./SUB-0501.md --program "0DIN GenAI"
+```
+
+- **Pursuit loop** over the submission queue; a submission is triaged (done) or blocked-with-reason, never silently dropped
+- AI-native taxonomy: prompt injection, jailbreak, data leakage, unbounded consumption, tool abuse
+- Escalates criticals immediately; dedups on root cause, not wording; drafts honest researcher-facing responses
+
+### `/disclosure-writer`
+
+Turns a confirmed finding into a **coordinated** (not full) disclosure package — report, reproduction, impact, remediation, disclosure timeline, and an optional CVE-request draft.
+
+```
+/disclosure-writer ./probe-report.md --vendor "Acme" --cve
+```
+
+- Coordinated posture: vendor first, public later, remediation window respected
+- De-fanged public artifacts — informs defenders without shipping a turnkey attack
+- Flags when CVSS/CVE fit an AI-behavior finding poorly and routes to the vendor's AI-vuln channel instead
+
+---
+
 ## AI Framework Skills
 
 ### `/mastra-expert`
@@ -510,6 +655,19 @@ For defensive security research:
 /stack-check            → Verify all dependency versions
     ↓
 /script-writer          → Create content about the research
+```
+
+For GenAI security research (find → triage → disclose):
+```
+/red-team-scaffold      → Build the testing lab
+    ↓
+/prompt-injection-probe → Run the probe battery against an authorized target (Pursuit loop)
+    ↓
+/vuln-triage            → Triage findings / incoming submissions (Pursuit loop)
+    ↓
+/disclosure-writer      → Coordinated responsible-disclosure package
+    ↓
+/community-manager      → Researcher recognition + disclosure comms
 ```
 
 For content performance optimization:

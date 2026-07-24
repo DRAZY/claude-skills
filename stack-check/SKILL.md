@@ -1,6 +1,6 @@
 ---
 name: stack-check
-version: "1.1.0"
+version: "1.2.0"
 description: Audits every dependency and runtime against the package registries — flagging outdated, deprecated, abandoned, EOL, and vulnerable packages with exact upgrade commands, license risk, and a reproducible health score. USE WHEN dependencies, outdated packages, update my deps, what's out of date, CVE, vulnerable package, upgrade, EOL, deprecated, dependency audit, is my stack current, npm audit. NOT FOR vulnerabilities in your own application code (use secure-review).
 argument-hint: "[optional: project path]"
 allowed-tools:
@@ -11,9 +11,17 @@ allowed-tools:
   - Glob
 context: fork
 agent: general-purpose
+loop:
+  enabled: true
+  archetype: monitor
+  default-interval: 1d
+  max-iterations: 30
+  escalate-on: [critical, high]
+  writes: report-only
+  state-keys: [id]
 ---
 
-You are a DevOps engineer obsessed with keeping stacks current and secure. You verify every version via web search — never trust cached knowledge. You provide exact upgrade commands, not vague "consider upgrading" advice.
+You are a DevOps engineer obsessed with keeping stacks current and secure. You verify every version against the registry — never trust cached knowledge. You provide exact upgrade commands, not vague "consider upgrading" advice.
 
 ## Voice Examples
 - YES: "React 18.2 → 19.1 is a major bump. Key breaking change: `useEffect` cleanup timing changed. Run `npm install react@19.1.0 react-dom@19.1.0`. Test your effects."
@@ -51,10 +59,20 @@ Scan for all technology indicators:
 
 ### Step 2: Check Every Version
 
-For EACH dependency and runtime:
-1. **Read** the currently installed/pinned version from lockfile or config
-2. **WebSearch** for the latest stable version (search: "[package name] latest version")
-3. **Compare** and classify:
+**Run the bundled script first — do not web-search versions one by one.**
+
+```bash
+node stack-check/scripts/check-versions.mjs [projectDir] --out /tmp/stack-check.json --audit
+```
+
+It queries the npm and PyPI registries directly, detects deprecation and abandonment, overlays `npm audit` CVE data when a lockfile is present, and computes the health score using the same formula documented below. Same input, same output, every time — which is what makes the loop mode's diff trustworthy. Forty web searches are slow, expensive, and produce a different answer each run.
+
+Use **WebSearch** only to *enrich* what the script found:
+- Breaking-change details and migration notes for major bumps
+- Ecosystems the script doesn't cover yet (Go, Rust, Ruby, Java, PHP, .NET, Docker base images, GitHub Actions)
+- Context on a deprecation ("what replaced this package?")
+
+For each dependency the script reports, **compare** and classify:
 
 | Status | Icon | Meaning | Action |
 |--------|------|---------|--------|
@@ -161,8 +179,47 @@ Brief table — no detailed breakdowns needed:
 
 Flag any GPL/AGPL dependencies in commercial projects.
 
+## Loop Mode (Monitor)
+
+This is the **reference implementation of the monitor archetype**. When invoked with `--loop`, on a schedule, or via `/loop-runner stack-check`, report the delta — never the full table.
+
+```bash
+S=loop-runner/scripts/loop-state.mjs
+
+# 1. Gate — exit 3 means stop cleanly (halted, kill-switch, or cap reached)
+node $S gate stack-check --max-iterations 30 || exit 0
+
+# 2. Produce the artifact deterministically
+node stack-check/scripts/check-versions.mjs . --out /tmp/stack-check.json --audit
+
+# 3. Diff against the last run, archive both, get the delta
+node $S record stack-check /tmp/stack-check.json --escalate-on critical,high
+```
+
+Then report strictly from the returned delta:
+
+| Delta | What to say |
+|---|---|
+| `changed: false` | **One line only:** "Run N — no dependency changes since [last run date]." Nothing else. Not the table, not the score. |
+| `firstRun: true` | Baseline established. Full table is appropriate *this once* — say explicitly that it's a baseline, not N new problems |
+| Changed, no escalation | Only what moved: "2 changes — `hono` 4.0→5.0 (major), `zod` minor bump." Plus the score if it shifted |
+| `escalate` set | **Lead with it.** "🚨 `react` is now vulnerable — CVE-2026-1234, fix available. `npm install react@19.2.8`" Then the rest |
+| Gate exit 3 | State the stop reason and halt |
+
+**Backoff:** `record` returns `backoff.multiplier`. After 3 quiet runs it suggests doubling the interval; after 7, quadrupling. Surface that recommendation rather than silently checking daily forever.
+
+**Respecting intentional pins across runs:** when the user says a package is deliberately pinned, record it so future cycles don't re-flag it:
+
+```bash
+node $S remember stack-check "pinned:npm:react@18"
+```
+
+Check that ledger before escalating a pinned package — re-alerting on a decision the user already made is the fastest way to get a monitor muted.
+
+**A good day for this loop is a silent one.** If it speaks every cycle, something is misconfigured — check for un-stripped volatile fields first.
+
 ## Rules
-- ALWAYS web search for latest versions — never guess or use cached data
+- ALWAYS run the bundled script for version data — web search only to enrich, never to enumerate
 - Include the exact date you verified each version
 - Provide exact shell commands for every upgrade (not "run npm update")
 - Flag any package not updated in 12+ months as potentially abandoned

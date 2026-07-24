@@ -22,6 +22,22 @@ Thumbs.db
 .vscode/
 *.swp
 
+# ---------------------------------------------------------------------------
+# Loop state
+# ---------------------------------------------------------------------------
+# Loop state lives in .claude/skill-state/<skill>/ in whatever project a skill
+# runs in. Non-sensitive state (version snapshots, used-topic ledgers) is safe
+# to commit — it gives you history and makes CI loops work on a fresh clone.
+#
+# Security-sensitive state is NOT. Triage verdicts, finding hashes, and
+# submission queues describe unfixed vulnerabilities; committing them
+# publishes a map of what is broken and not yet patched.
+.claude/skill-state/secure-review/
+.claude/skill-state/defense-analyst/
+.claude/skill-state/vuln-triage/
+.claude/skill-state/prompt-injection-probe/
+*.local.json
+
 # Half-imported skill — not part of the published collection yet.
 # Remove this line once Media/ is finished (or delete the directory).
 Media/
