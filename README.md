@@ -533,7 +533,7 @@ For content performance optimization:
 
 ### Fresh Install
 ```bash
-git clone https://github.com/andre-zilla/claude-skills.git ~/.claude/skills
+git clone https://github.com/DRAZY/claude-skills.git ~/.claude/skills
 ```
 
 ### Sync Across Machines

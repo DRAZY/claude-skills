@@ -2,6 +2,22 @@
 
 All notable changes to this skill collection are documented here.
 
+## [1.1.1] - 2026-07-24
+
+Correctness and repo-hygiene pass. No behavioral changes to skill logic.
+
+### Fixed
+- **`/claude-api` (v1.0.0 -> v1.0.1)** — Replaced dead model IDs. `claude-sonnet-4-6` and `claude-opus-4-6` do not exist; every code example, the model table, and the default-model rule now use the current lineup (Opus 4.8 / Sonnet 5 / Haiku 4.5) with real context windows and pricing.
+- **`/claude-api`** — The extended-thinking example used `thinking: {type: "enabled", budget_tokens: N}`, which is **removed on Opus 4.8/4.7 and returns a 400**. Replaced with adaptive thinking plus `output_config.effort`, and documented that `display` defaults to `"omitted"`.
+- **`/claude-api`** — Corrected the Batch API call path: `client.batches.create()` -> `client.messages.batches.create()`.
+- **`/mastra-expert`** — Updated stale Anthropic model examples (`anthropic/claude-4-5-sonnet`) to a real ID.
+- **`README.md`** — Quick Start and Installation pointed at two different GitHub URLs; both now match the actual remote.
+- **`/social-repurpose`** — Platform section numbering skipped 5 (went 1,2,3,4,6,7,8,9); renumbered 1-8.
+
+### Added
+- `LICENSE` — MIT, matching the license the README already claimed.
+- `.gitignore` — was absent, which is why a `node_modules` tree was sitting loose in the working directory.
+
 ## [1.1.0] - 2026-03-06
 
 ### New Skills

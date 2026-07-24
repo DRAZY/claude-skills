@@ -116,7 +116,7 @@ User: "Deploy my Mastra app to Vercel"
 ```typescript
 // Direct provider: "provider/model-name"
 model: "openai/gpt-5.1"
-model: "anthropic/claude-4-5-sonnet"
+model: "anthropic/claude-opus-4-8"
 model: "google/gemini-2.5-flash"
 
 // Gateway: "gateway/provider/model"
@@ -133,7 +133,7 @@ model: ({ requestContext }) => requestContext.get("tier") === "enterprise"
 // Fallbacks
 model: [
   { model: "openai/gpt-5", maxRetries: 3 },
-  { model: "anthropic/claude-4-5-sonnet", maxRetries: 2 },
+  { model: "anthropic/claude-opus-4-8", maxRetries: 2 },
 ]
 ```
 

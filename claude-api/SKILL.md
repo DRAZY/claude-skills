@@ -1,6 +1,6 @@
 ---
 name: claude-api
-version: "1.0.0"
+version: "1.0.1"
 description: Build apps with the Claude API or Anthropic SDK. Guides through authentication, model selection, tool use, streaming, vision, prompt caching, batch API, and Agent SDK patterns.
 argument-hint: "[task or question about Claude API]"
 allowed-tools:
@@ -42,11 +42,11 @@ Common tasks and their recommended approaches:
 | Long/streaming responses | Streaming | `messages.stream()` or `messages.create(stream=True)` |
 | Structured data extraction | Tool use | Define tools with JSON schema |
 | Image/PDF analysis | Vision | Pass image/PDF in message content |
-| High-volume processing | Batch API | `batches.create()` for 50% cost savings |
+| High-volume processing | Batch API | `messages.batches.create()` for 50% cost savings |
 | Repeated system prompts | Prompt caching | `cache_control` on system/tool blocks |
 | Autonomous agents | Agent SDK | `claude_agent_sdk` for tool loops |
 | Multi-turn conversations | Message history | Pass full conversation in messages array |
-| Code generation | Extended thinking | Enable thinking for complex reasoning |
+| Complex reasoning | Adaptive thinking | `thinking: {type: "adaptive"}` + `output_config.effort` |
 
 ### Step 2: Verify Latest SDK Version
 
@@ -82,7 +82,7 @@ client = anthropic.Anthropic()
 **Basic Message:**
 ```typescript
 const message = await client.messages.create({
-  model: "claude-sonnet-4-6",
+  model: "claude-opus-4-8",
   max_tokens: 1024,
   messages: [{ role: "user", content: "Hello" }],
 });
@@ -91,7 +91,7 @@ const message = await client.messages.create({
 **Streaming:**
 ```typescript
 const stream = client.messages.stream({
-  model: "claude-sonnet-4-6",
+  model: "claude-opus-4-8",
   max_tokens: 1024,
   messages: [{ role: "user", content: "Write a story" }],
 });
@@ -106,7 +106,7 @@ for await (const event of stream) {
 **Tool Use:**
 ```typescript
 const response = await client.messages.create({
-  model: "claude-sonnet-4-6",
+  model: "claude-opus-4-8",
   max_tokens: 1024,
   tools: [
     {
@@ -129,7 +129,7 @@ const response = await client.messages.create({
 **Vision (Image):**
 ```typescript
 const message = await client.messages.create({
-  model: "claude-sonnet-4-6",
+  model: "claude-opus-4-8",
   max_tokens: 1024,
   messages: [
     {
@@ -149,7 +149,7 @@ const message = await client.messages.create({
 **Prompt Caching:**
 ```typescript
 const message = await client.messages.create({
-  model: "claude-sonnet-4-6",
+  model: "claude-opus-4-8",
   max_tokens: 1024,
   system: [
     {
@@ -162,23 +162,29 @@ const message = await client.messages.create({
 });
 ```
 
-**Extended Thinking:**
+**Adaptive Thinking + Effort:**
 ```typescript
 const message = await client.messages.create({
-  model: "claude-opus-4-6",
+  model: "claude-opus-4-8",
   max_tokens: 16000,
-  thinking: { type: "enabled", budget_tokens: 10000 },
+  // Claude decides how much to think per request. The old fixed-budget form —
+  // { type: "enabled", budget_tokens: N } — is REMOVED on Opus 4.8/4.7 and
+  // returns a 400. There is no budget_tokens replacement; use effort instead.
+  thinking: { type: "adaptive", display: "summarized" },
+  output_config: { effort: "high" }, // low | medium | high | xhigh | max
   messages: [{ role: "user", content: "Solve this complex problem..." }],
 });
 ```
 
+`display` defaults to `"omitted"` — thinking blocks stream with empty text. Set `"summarized"` if you surface reasoning to users, or a streaming UI will look like a long pause before output.
+
 **Batch API:**
 ```typescript
-const batch = await client.batches.create({
+const batch = await client.messages.batches.create({
   requests: items.map((item, i) => ({
     custom_id: `request-${i}`,
     params: {
-      model: "claude-sonnet-4-6",
+      model: "claude-opus-4-8",
       max_tokens: 1024,
       messages: [{ role: "user", content: item.prompt }],
     },
@@ -189,13 +195,15 @@ const batch = await client.batches.create({
 
 ### Model Selection Guide
 
-| Model | Best For | Speed | Cost |
-|-------|----------|-------|------|
-| `claude-opus-4-6` | Complex reasoning, coding, analysis | Slower | $$$ |
-| `claude-sonnet-4-6` | General purpose, good balance | Fast | $$ |
-| `claude-haiku-4-5` | High-volume, simple tasks, classification | Fastest | $ |
+| Model | Model ID | Context | Input $/1M | Output $/1M | Best For |
+|-------|----------|---------|-----------|------------|----------|
+| Claude Opus 4.8 | `claude-opus-4-8` | 1M | $5.00 | $25.00 | Complex reasoning, coding, long-horizon agentic work |
+| Claude Sonnet 5 | `claude-sonnet-5` | 1M | $3.00 | $15.00 | General purpose, high-volume production |
+| Claude Haiku 4.5 | `claude-haiku-4-5` | 200K | $1.00 | $5.00 | Classification, routing, simple high-volume tasks |
 
-**Default recommendation:** Start with `claude-sonnet-4-6`. Upgrade to Opus for complex tasks. Downgrade to Haiku for high-volume simple tasks.
+**Default recommendation:** Use `claude-opus-4-8` unless you have a specific reason not to. Drop to Sonnet 5 for high-volume production workloads, Haiku 4.5 for simple classification. Never downgrade purely for cost without asking — that's the user's call.
+
+**Use exact ID strings — never append date suffixes.** `claude-opus-4-8`, not `claude-opus-4-8-20260115`. Verify current IDs against the [models overview](https://platform.claude.com/docs/en/about-claude/models/overview) rather than relying on memory; model lineups move faster than this file.
 
 ### Cost Optimization
 
@@ -231,7 +239,7 @@ let messages = [{ role: "user", content: userInput }];
 
 while (true) {
   const response = await client.messages.create({
-    model: "claude-sonnet-4-6",
+    model: "claude-opus-4-8",
     max_tokens: 4096,
     tools: myTools,
     messages,
@@ -258,13 +266,13 @@ while (true) {
 ```
 
 ## Rules
-- ALWAYS check for the latest SDK version via web search before writing code
+- ALWAYS verify the latest SDK version AND current model IDs before writing code — model lineups change faster than this file
 - ALWAYS use environment variables for API keys — never hardcode them
 - ALWAYS handle rate limits with exponential backoff
 - Prefer streaming for any user-facing response
 - Use prompt caching when the same system prompt or context is sent more than once
 - Use the Batch API for non-real-time workloads over 10 requests
-- Default to `claude-sonnet-4-6` unless the task specifically needs Opus or Haiku
+- Default to `claude-opus-4-8`; drop to Sonnet 5 or Haiku 4.5 only when the workload justifies it
 - Include proper TypeScript types — never use `any`
 - Set `max_tokens` appropriately — don't default to the maximum
 
