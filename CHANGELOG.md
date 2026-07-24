@@ -11,11 +11,17 @@ noise — the governing rule is that a loop reports the **delta**, not the repor
 - **`/loop-runner`** (v1.0.0) — Meta-skill that runs any loop-enabled skill continually. Owns state, dedupe, delta computation, stop conditions, backoff, and escalation policy so individual skills stay simple. Three archetypes: monitor, producer, pursuit.
 
 ### New Infrastructure
-- **`loop-runner/scripts/loop-state.mjs`** — Zero-dependency state and delta engine. Commands: `init`, `status`, `gate`, `hash`, `seen`, `remember`, `record`, `digest`, `halt`, `resume`, `reset`. Diffs artifacts item-by-item with volatile fields (timestamps, durations) stripped so a re-run with no real change reports `changed: false`.
+- **`loop-runner/scripts/loop-state.mjs`** — Zero-dependency state and delta engine. Commands: `init`, `status`, `gate`, `hash`, `seen`, `remember`, `record`, `digest`, `enqueue`, `claim`, `complete`, `block`, `progress`, `halt`, `resume`, `reset`. Diffs artifacts item-by-item with volatile fields (timestamps, durations) stripped so a re-run with no real change reports `changed: false`; manages a Pursuit task queue with a status lifecycle and stall guard.
 - **`stack-check/scripts/check-versions.mjs`** — Zero-dependency dependency audit querying npm and PyPI registries directly, with deprecation and abandonment detection, optional `npm audit` CVE overlay, and a reproducible health score. Replaces per-package web searching, which was slow, expensive, and non-deterministic — and therefore unusable as a loop baseline.
 - **`.github/workflows/nightly-stack-check.yml`** — Working CI loop: gate → artifact → delta → open an issue only on escalation. The deterministic half runs with no secrets configured.
 - **`loop-runner/references/LoopContract.md`** — Frontmatter schema, artifact schema, state layout, `id` selection guidance, volatile-field rules, and the checklist for making an existing skill loopable.
 - **`loop-runner/references/Archetypes.md`** — Monitor / producer / pursuit patterns, each with its failure modes and discipline.
+
+### Pursuit hardening — working loops end in a conclusion, not a drop-off
+- **Task status lifecycle in the engine.** Every Pursuit task moves through `pending → in-progress → done | blocked` in `queue.json`. A task is never silently abandoned; `blocked` is a first-class reported outcome carrying a reason. New commands: `enqueue`, `claim`, `complete`, `block`, `progress`.
+- **Two terminal classes.** `gate` and `progress` classify a Pursuit loop as **converged** (queue empty — the good ending) or **interrupted** (a stop condition fired with work remaining — reported loudly). Going quiet mid-backlog with no report is now the one explicitly forbidden ending.
+- **Stall guard.** `claim` re-serves an unresolved in-progress task and auto-blocks it after `--max-attempts` (default 3), so every cycle strictly reduces the queue and no loop can spin forever on one item.
+- Documented the doctrine in `LoopContract.md` §7 (Completion vs interruption), a sharpened Pursuit section in `Archetypes.md`, and the `loop-runner` SKILL.md — including the refined Iron Rule: silence means success for a Monitor, but for a Pursuit loop it means success *only* when converged.
 
 ### Safety
 - Added a `loop:` frontmatter contract to all affected skills. The `writes` field (`report-only` | `files` | `infra`) is a hard gate: **only `report-only` may run unattended.**

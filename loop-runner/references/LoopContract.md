@@ -114,6 +114,7 @@ State lives in the **project the skill runs in**, not in the skills repo.
 .claude/skill-state/<skill>/
 ├── state.json      { runs, firstRun, lastRun, consecutiveNoChange, halted, haltReason, lastArtifactHash }
 ├── seen.json       { "<hash>": { key, firstSeen } }   — producer dedupe ledger
+├── queue.json      { tasks: { "<id>": { status, priority, attempts, ... } } }  — pursuit backlog
 ├── latest.json     most recent artifact (the diff baseline)
 └── history/
     ├── 2026-07-24T04-05-30-900Z.artifact.json
@@ -171,12 +172,71 @@ Report rules keyed off this object:
 1. `state.halted` is true (`loop-state halt <skill>`)
 2. The kill-switch file exists (`.claude/skill-state/<skill>/STOP`)
 3. `runs >= --max-iterations`
+4. A Pursuit queue exists and has **converged** (no tasks remaining)
 
-Always run `gate` before a cycle. CI steps should treat exit 3 as success-with-no-work.
+Always run `gate` before a cycle. CI steps should treat exit 3 as success-with-no-work — but see §7: exit 3 alone is not enough for a Pursuit loop.
 
 ---
 
-## 7. Adding loop support to a skill
+## 7. Completion vs interruption — a working loop ends in a conclusion
+
+This is the rule that separates a *thoughtful* loop from one that quits willy-nilly. A Pursuit loop works a backlog to a **conclusion**, never a silent drop-off. There are exactly two legitimate ways for it to go quiet, and one forbidden way:
+
+| Terminal class | When | What the loop must do |
+|---|---|---|
+| **converged** | The queue is empty — every task is `done` or `blocked` | Report the completion: what finished, what's blocked and why |
+| **interrupted** | A stop condition (halt, kill-switch, iteration cap) fired **with work still remaining** | Report **loudly**: where it stopped, how many tasks remain, why it stopped |
+| **~~dropped~~** | Goes quiet with work remaining and *no report* | **Forbidden.** This is the failure this whole section exists to prevent |
+
+`gate` classifies the loop for you in its `terminal` field (`converged` \| `interrupted` \| `working` \| `null`). **The caller must branch on it** — treating a bare exit 3 as "silently done" is the bug. Converged means celebrate; interrupted means sound the alarm.
+
+### Task status lifecycle
+
+Every task lives in exactly one state, and can never be silently abandoned:
+
+```
+pending ──claim──▶ in-progress ──complete──▶ done
+                        │
+                        ├──block──▶ blocked   (a reported outcome, with a reason)
+                        │
+                        └──(N failed claims)──▶ blocked   (auto-blocked: stall guard)
+```
+
+- **`done`** means *verified* done — not "the skill ran once against this item."
+- **`blocked`** is a first-class, reported outcome carrying a reason. A blocker is surfaced to a human, never hidden.
+- A task cannot vanish. If it isn't `done`, it's `pending`, `in-progress`, or `blocked` — always accountable.
+
+### The stall guard
+
+The Pursuit invariant is: **every cycle strictly reduces the remaining queue.** The engine enforces this so a loop can't spin forever on one item:
+
+- `claim` re-serves an unresolved `in-progress` task (rather than picking a new one), incrementing its `attempts`.
+- After `--max-attempts` claims without a `complete` or `block` (default 3), the task is **auto-blocked** with a `stalled` reason and flagged for escalation.
+
+So the queue always moves toward resolution: each claim ends in `complete`, `block`, or — as a backstop — an auto-block. It can never quietly stall.
+
+### The Pursuit cycle
+
+```bash
+S=loop-runner/scripts/loop-state.mjs
+
+node $S enqueue vuln-triage sub-101 sub-102 sub-103   # seed the backlog
+
+while node $S gate vuln-triage --max-iterations 50; do   # exit 3 = terminal, break
+  task=$(node $S claim vuln-triage | jq -r '.task.id // empty')
+  [ -z "$task" ] && break                                # queue drained
+  #  ...do the work on $task...
+  node $S complete vuln-triage "$task"                   # or: block <id> "<reason>"
+done
+
+node $S progress vuln-triage   # terminal report: converged | interrupted + blocked list
+```
+
+Read `gate`'s `terminal` (or `progress` after the loop) and give the matching report. **Never end a Pursuit run without one.**
+
+---
+
+## 8. Adding loop support to a skill
 
 1. Decide the archetype (`references/Archetypes.md`)
 2. Add the `loop:` frontmatter block — be honest about `writes`

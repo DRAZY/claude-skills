@@ -98,26 +98,34 @@ gate → read backlog → work highest-priority item → mark done → re-rank �
 
 ### Pattern
 
+The engine manages the queue and its status lifecycle for you — you enqueue, claim, and resolve. See `LoopContract.md` §7 for the full contract.
+
 ```bash
 S=loop-runner/scripts/loop-state.mjs
 
-while node $S gate vuln-triage --max-iterations 50; do
-  #  1. read the queue artifact
-  #  2. pick the highest-priority untriaged item
-  #  3. do the work
-  #  4. mark it done, emit the updated queue as the artifact
-  node $S record vuln-triage /tmp/queue.json
-  #  5. stop when the delta shows nothing left untriaged
+node $S enqueue vuln-triage sub-101 sub-102 sub-103   # seed the backlog once
+
+while node $S gate vuln-triage --max-iterations 50; do   # exit 3 = terminal
+  task=$(node $S claim vuln-triage | jq -r '.task.id // empty')
+  [ -z "$task" ] && break
+  #  ...do the work on $task, thoroughly...
+  node $S complete vuln-triage "$task"       # verified done
+  #  ...or, if you can't finish it:
+  #  node $S block vuln-triage "$task" "waiting on reporter for repro steps"
 done
+
+node $S progress vuln-triage   # the terminal report — always give one
 ```
 
-### Termination
+### Termination — end in a conclusion, never a drop-off
 
-Pursuit is the only archetype that can genuinely finish. Define "dry" explicitly and check it every cycle:
+Pursuit is the only archetype that can genuinely finish, and it **must finish out loud.** `gate` classifies the loop in its `terminal` field; branch on it:
 
-- **Queue empty** → report completion and halt
-- **N consecutive cycles with no progress** → halt and escalate; something is stuck
-- **Iteration cap** → halt and report what remains
+- **converged** (queue empty) → report the completion: what's done, what's blocked and why. This is the "ultimate conclusion."
+- **interrupted** (cap / kill-switch / halt fired with work remaining) → report **loudly**: where it stopped, how many tasks remain, why. An interruption that reports is fine; one that goes silent is the failure this archetype exists to prevent.
+- **working** → keep going.
+
+The engine guarantees the queue can't spin forever: `claim` re-serves an unresolved in-progress task and auto-blocks it after `--max-attempts` (default 3), so every cycle strictly reduces the remaining count. A task is always `pending`, `in-progress`, `done`, or `blocked` — never silently abandoned.
 
 Loop-until-dry beats loop-until-count: a fixed `while (count < 10)` misses the tail, and a queue that refills mid-run will terminate early.
 
@@ -125,13 +133,14 @@ Loop-until-dry beats loop-until-count: a fixed `while (count < 10)` misses the t
 
 | Symptom | Cause | Fix |
 |---|---|---|
-| Infinite loop | "Done" never marked, or re-queued each cycle | Assert the untriaged count strictly decreases |
-| Works the same item forever | Priority re-ranking puts it back on top | Exclude done-items from ranking |
-| Silent stall | Item fails but isn't marked failed | Track attempt counts; halt after N attempts |
+| Infinite loop | "Done" never marked, so the task is re-served every cycle | The engine auto-blocks after `--max-attempts`; don't defeat it by never calling `complete`/`block` |
+| Works the same item forever | Claiming a new task while one is still in-progress | `claim` re-serves the in-progress task first by design — resolve it before the next claim |
+| Silent stall | Item fails but is never resolved | Call `block <id> <reason>` when you can't finish; the stall guard is the backstop, not the plan |
+| Ends without a report | Treating gate's exit 3 as "silently done" | Branch on `gate`'s `terminal` field — converged vs interrupted — and always give the matching report |
 
 ### The discipline
 
-Every cycle must **strictly reduce** the remaining queue. If a cycle ends with the same untriaged count it started with, that's a stall — halt and say so rather than burning the iteration cap.
+Every cycle **strictly reduces** the remaining queue — the engine enforces this, but you close the loop by resolving each claimed task (`complete` or `block`) rather than leaving it hanging. And every run ends in a stated conclusion: converged (done) or interrupted (stopped here, N remain, why). A Pursuit loop that goes quiet without saying which is the one thing it must never do.
 
 ---
 

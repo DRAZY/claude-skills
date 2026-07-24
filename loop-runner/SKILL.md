@@ -26,6 +26,8 @@ You run other skills on repeat without becoming noise. Your discipline is simple
 
 **Default to silence. Speak on delta.** If a cycle finds nothing new, record it to history and say so in one line. Never re-print an unchanged report.
 
+**The one exception — Pursuit loops.** For a working loop that's clearing a backlog, silence is *only* acceptable once the work is genuinely done (**converged**). If a Pursuit loop stops with tasks remaining (**interrupted**), it must say so loudly — never go quiet mid-backlog. A working loop ends in a stated conclusion, not an unexplained silence. See "Pursuit and the terminal report" below.
+
 ## Instructions
 
 ### Step 1: Resolve the target skill
@@ -52,7 +54,37 @@ Route by the skill's declared archetype. Full patterns in `references/Archetypes
 |---|---|---|
 | **monitor** | Fetch current state → diff vs last → report only what moved | `stack-check` |
 | **producer** | Read the seen-ledger → generate only NEW items → append to ledger | `content-plan` |
-| **pursuit** | Work the highest-priority queue item → mark done → repeat until dry | `vuln-triage` (planned) |
+| **pursuit** | Claim highest-priority task → work it → complete or block → repeat until converged | `vuln-triage` (planned) |
+
+### Pursuit and the terminal report
+
+A Pursuit loop works a backlog to a **conclusion**, never a silent drop-off. The engine tracks every task through `pending → in-progress → done | blocked` and classifies the loop's ending for you:
+
+```bash
+S=loop-runner/scripts/loop-state.mjs
+
+node $S enqueue vuln-triage sub-101 sub-102 sub-103    # seed the backlog
+
+while node $S gate vuln-triage --max-iterations 50; do # exit 3 = terminal, break
+  task=$(node $S claim vuln-triage | jq -r '.task.id // empty')
+  [ -z "$task" ] && break
+  #  ...work the task thoroughly...
+  node $S complete vuln-triage "$task"                 # verified done
+  #  ...or if you can't finish it: block <id> "<reason>"
+done
+
+node $S progress vuln-triage    # terminal report — always give one
+```
+
+`gate` and `progress` both return a `terminal` field. **Branch on it, and always report:**
+
+| `terminal` | Meaning | What to say |
+|---|---|---|
+| `converged` | Queue empty — the good ending | "Done. N completed, M blocked (list them and why)." |
+| `interrupted` | A stop condition fired with work remaining | **Loudly:** "Stopped at the cap. K of T tasks remain. Here's where I am and why." |
+| `working` | Neither — keep going | (continue the loop) |
+
+The engine's **stall guard** makes forever-loops impossible: `claim` re-serves an unresolved in-progress task and auto-blocks it after `--max-attempts` (default 3), so every cycle strictly shrinks the queue. A task is never silently abandoned. Full contract: `references/LoopContract.md` §7.
 
 ### Step 4: Record and decide
 
@@ -116,12 +148,22 @@ Commit non-sensitive state (version snapshots, used-topic ledgers) — it gives 
 ```bash
 S=loop-runner/scripts/loop-state.mjs
 
+# Monitor / Producer
 node $S init <skill>                       # create state dir
 node $S gate <skill> --max-iterations 30   # stop-condition check (exit 3 = stop)
 node $S seen <skill> "topic a" "topic b"   # filter to unseen keys only
 node $S remember <skill> "topic a"         # add to dedupe ledger
 node $S record <skill> artifact.json       # diff, archive, report delta
 node $S digest <skill> 10                  # roll up the last 10 runs
+
+# Pursuit (work a backlog to a conclusion)
+node $S enqueue <skill> id1 id2            # add tasks as pending
+node $S claim <skill>                      # claim next task (auto-blocks a stalled one)
+node $S complete <skill> id1               # mark verified done
+node $S block <skill> id2 "why it's stuck" # mark blocked, with a reason
+node $S progress <skill>                   # terminal report: converged | interrupted
+
+# Lifecycle
 node $S halt <skill> "reason"              # stop the loop
 node $S resume <skill>                     # clear the halt flag
 ```
@@ -135,9 +177,11 @@ Three ways to stop a loop, all of which `gate` honours:
 3. `--max-iterations <n>` — hard cap
 
 ## Rules
-- Never re-print unchanged state — the delta is the deliverable
+- Never re-print unchanged state — the delta is the deliverable (Monitor/Producer)
+- **Never end a Pursuit loop without a terminal report** — converged or interrupted, always stated. Silence mid-backlog is the one forbidden ending.
+- Resolve every claimed task — `complete` or `block`. Never leave a task hanging; a blocker is reported, not dropped.
 - Never loop a skill whose `loop.writes` is not `report-only`
-- Always run `gate` before a cycle and `record` after
+- Always run `gate` before a cycle. Run `record` after (Monitor/Producer) or resolve the claimed task (Pursuit).
 - Escalate on severity, not on volume — 40 low-severity drifts are quieter than 1 critical
 - Every cycle writes to `history/` even when silent, so `digest` can reconstruct the trail
 - If a skill has no `loop:` block, treat it as not loop-enabled — do not improvise one
@@ -148,7 +192,9 @@ Three ways to stop a loop, all of which `gate` honours:
 - **Artifact missing `items[]`:** The skill isn't emitting the loop schema; point at `references/LoopContract.md`
 - **Escalation on the first run:** Report it, but note the baseline caveat — it may be pre-existing, not new
 - **Long quiet streak:** Suggest widening the interval rather than silently continuing
-- **User asks "what happened while I was away":** Run `digest`, not a fresh cycle
+- **Pursuit hits the iteration cap mid-backlog:** This is `interrupted`, not done — report what remains and why, loudly
+- **A task auto-blocks (stall guard fired):** Surface it for a human — it didn't converge on its own; don't bury it
+- **User asks "what happened while I was away":** Run `digest` (Monitor/Producer) or `progress` (Pursuit), not a fresh cycle
 
 ## Next Steps
 - `references/LoopContract.md` — frontmatter schema, artifact schema, state layout

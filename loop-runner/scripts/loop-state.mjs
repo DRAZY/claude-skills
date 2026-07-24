@@ -120,6 +120,65 @@ function saveState(skill, state) {
 }
 
 // ---------------------------------------------------------------------------
+// pursuit queue — the working-loop backbone
+// ---------------------------------------------------------------------------
+//
+// A Pursuit loop works a backlog to a *conclusion*, never a silent drop-off.
+// Every task lives in exactly one of four states, and the only two ways a loop
+// may go quiet are CONVERGED (queue empty) and INTERRUPTED (a stop condition
+// fired with work remaining — reported loudly). A task is never abandoned: it
+// is pending, in-progress, done, or blocked. `blocked` is a *reported* outcome
+// with a reason, not a disappearance.
+
+const TASK_STATES = ["pending", "in-progress", "done", "blocked"];
+const DEFAULT_MAX_ATTEMPTS = 3;
+
+function queuePath(skill) {
+  return join(skillDir(skill), "queue.json");
+}
+
+function defaultQueue(skill) {
+  return { skill, tasks: {} };
+}
+
+function loadQueue(skill) {
+  return readJson(queuePath(skill), defaultQueue(skill));
+}
+
+function saveQueue(skill, queue) {
+  writeJson(queuePath(skill), queue);
+}
+
+/** Counts by status, plus the derived remaining/resolved totals. */
+function queueTally(queue) {
+  const tally = { pending: 0, "in-progress": 0, done: 0, blocked: 0 };
+  for (const task of Object.values(queue.tasks)) {
+    tally[task.status] = (tally[task.status] ?? 0) + 1;
+  }
+  return {
+    ...tally,
+    total: Object.keys(queue.tasks).length,
+    remaining: tally.pending + tally["in-progress"],
+    resolved: tally.done + tally.blocked,
+  };
+}
+
+/**
+ * Terminal classification for a Pursuit loop. This is the whole point of the
+ * hardening: a working loop ends in a named conclusion, not an unexplained
+ * silence.
+ *   converged   — remaining == 0. The good ending. Report what completed.
+ *   interrupted — a stop condition fired with work still remaining. Report
+ *                 LOUDLY: where it stopped, how much is left, why.
+ *   working     — neither; keep going.
+ */
+function classifyTerminal(tally, interrupted) {
+  if (tally.remaining === 0) return "converged";
+  if (interrupted) return "interrupted";
+  return "working";
+}
+
+// ---------------------------------------------------------------------------
 // artifact normalisation
 // ---------------------------------------------------------------------------
 
@@ -253,14 +312,37 @@ const commands = {
       reasons.push(`max-iterations reached (${state.runs}/${maxIterations})`);
     }
 
+    // If this skill runs a Pursuit queue, fold its terminal state into the gate
+    // so the caller gets a single, unambiguous stop signal with a *class*.
+    const hasQueue = existsSync(queuePath(skill));
+    let tally = null;
+    let terminal = null;
+    if (hasQueue) {
+      tally = queueTally(loadQueue(skill));
+      const stopFired = reasons.length > 0;
+      terminal = classifyTerminal(tally, stopFired);
+      if (terminal === "converged") {
+        reasons.push(`converged — queue empty (${tally.done} done, ${tally.blocked} blocked)`);
+      } else if (terminal === "interrupted") {
+        reasons.push(`interrupted — ${tally.remaining} task(s) still remaining`);
+      }
+    } else if (reasons.length > 0) {
+      terminal = "interrupted";
+    }
+
     const proceed = reasons.length === 0;
     emit({
       proceed,
       skill,
       runs: state.runs,
       reasons,
+      terminal, // converged | interrupted | working | null
+      ...(hasQueue ? { queue: tally } : {}),
       backoff: suggestBackoff(state.consecutiveNoChange),
     });
+    // Exit 3 is a CLEAN stop — but the caller must branch on `terminal`:
+    // converged = celebrate and report what finished; interrupted = report
+    // LOUDLY what remains. Never treat exit 3 as "silently done."
     if (!proceed) process.exit(3);
   },
 
@@ -297,6 +379,147 @@ const commands = {
     }
     writeJson(path, ledger);
     emit({ skill, recorded, ledgerSize: Object.keys(ledger).length });
+  },
+
+  // -------------------------------------------------------------------------
+  // Pursuit commands — work a backlog to a conclusion
+  // -------------------------------------------------------------------------
+
+  /** Add tasks to the queue as `pending`. Idempotent — existing tasks are untouched. */
+  enqueue(skill, ...ids) {
+    if (ids.length === 0) fail("enqueue needs at least one task id");
+    const priority = Number(flags.priority ?? 0);
+    const queue = loadQueue(skill);
+    const added = [];
+    const existing = [];
+    for (const id of ids) {
+      if (queue.tasks[id]) {
+        existing.push(id);
+        continue;
+      }
+      queue.tasks[id] = {
+        id,
+        status: "pending",
+        priority,
+        attempts: 0,
+        firstSeen: nowIso(),
+        lastAttempt: null,
+        resolvedAt: null,
+        note: null,
+      };
+      added.push(id);
+    }
+    saveQueue(skill, queue);
+    emit({ skill, added, existing, queue: queueTally(queue) });
+  },
+
+  /**
+   * Claim the next task to work. Single-worker semantics: an unresolved
+   * in-progress task is re-served (attempts++) before any new pending task is
+   * picked — that re-serve IS the stall guard. Once a task hits --max-attempts
+   * without a complete/block, it is auto-blocked with a stall reason so the
+   * queue can never spin forever on one item. Every claim strictly moves the
+   * queue toward resolution.
+   */
+  claim(skill) {
+    const maxAttempts = Number(flags["max-attempts"] ?? DEFAULT_MAX_ATTEMPTS);
+    const queue = loadQueue(skill);
+    const tasks = Object.values(queue.tasks);
+
+    // 1. Re-serve any in-progress task first — never run two at once.
+    const inProgress = tasks.find((t) => t.status === "in-progress");
+    if (inProgress) {
+      if (inProgress.attempts >= maxAttempts) {
+        inProgress.status = "blocked";
+        inProgress.resolvedAt = nowIso();
+        inProgress.note = `stalled: ${inProgress.attempts} attempts without completion`;
+        saveQueue(skill, queue);
+        emit({
+          skill,
+          stalled: inProgress.id,
+          reason: inProgress.note,
+          hint: "escalate this — it did not converge on its own",
+          queue: queueTally(queue),
+        });
+        return;
+      }
+      inProgress.attempts += 1;
+      inProgress.lastAttempt = nowIso();
+      saveQueue(skill, queue);
+      emit({ skill, task: inProgress, reclaim: true, queue: queueTally(queue) });
+      return;
+    }
+
+    // 2. Otherwise pick the highest-priority pending task (tiebreak: oldest).
+    const pending = tasks
+      .filter((t) => t.status === "pending")
+      .sort((a, b) => b.priority - a.priority || a.firstSeen.localeCompare(b.firstSeen));
+    if (pending.length === 0) {
+      const tally = queueTally(queue);
+      emit({ skill, empty: true, terminal: classifyTerminal(tally, false), queue: tally });
+      return;
+    }
+    const task = pending[0];
+    task.status = "in-progress";
+    task.attempts += 1;
+    task.lastAttempt = nowIso();
+    saveQueue(skill, queue);
+    emit({ skill, task, reclaim: false, queue: queueTally(queue) });
+  },
+
+  /** Mark a task done — a *verified* conclusion, not "the skill ran once". */
+  complete(skill, id) {
+    if (!id) fail("complete needs a task id");
+    const queue = loadQueue(skill);
+    const task = queue.tasks[id];
+    if (!task) fail(`unknown task: ${id}`);
+    task.status = "done";
+    task.resolvedAt = nowIso();
+    saveQueue(skill, queue);
+    emit({ skill, completed: id, queue: queueTally(queue) });
+  },
+
+  /** Mark a task blocked WITH a reason — a reported outcome, never a silent drop. */
+  block(skill, id, ...reason) {
+    if (!id) fail("block needs a task id");
+    if (reason.length === 0) fail("block needs a reason — a blocker is reported, not hidden");
+    const queue = loadQueue(skill);
+    const task = queue.tasks[id];
+    if (!task) fail(`unknown task: ${id}`);
+    task.status = "blocked";
+    task.resolvedAt = nowIso();
+    task.note = reason.join(" ");
+    saveQueue(skill, queue);
+    emit({ skill, blocked: id, reason: task.note, queue: queueTally(queue) });
+  },
+
+  /**
+   * The terminal report for a Pursuit loop. Pure read. Classifies the queue as
+   * converged / interrupted / working and lists every blocked task loudly, so a
+   * loop can never end in unexplained silence.
+   */
+  progress(skill) {
+    if (!existsSync(queuePath(skill))) {
+      return emit({ skill, terminal: "converged", queue: queueTally(defaultQueue(skill)), note: "no queue" });
+    }
+    const state = loadState(skill);
+    const queue = loadQueue(skill);
+    const tally = queueTally(queue);
+    const stopFired = state.halted || existsSync(flags["kill-file"] || join(skillDir(skill), "STOP"));
+    const blocked = Object.values(queue.tasks)
+      .filter((t) => t.status === "blocked")
+      .map((t) => ({ id: t.id, reason: t.note }));
+    const remainingIds = Object.values(queue.tasks)
+      .filter((t) => t.status === "pending" || t.status === "in-progress")
+      .map((t) => ({ id: t.id, status: t.status }));
+
+    emit({
+      skill,
+      terminal: classifyTerminal(tally, stopFired),
+      queue: tally,
+      blocked, // report these loudly — they need a human
+      remaining: remainingIds,
+    });
   },
 
   /**
@@ -419,7 +642,7 @@ const commands = {
 
 Usage: node loop-state.mjs <command> [args] [flags]
 
-Commands
+Monitor / Producer commands
   init <skill>                       create the state directory
   status <skill>                     run count, halt flag, backoff suggestion
   gate <skill>                       stop-condition check (exit 3 = do not run)
@@ -428,6 +651,15 @@ Commands
   remember <skill> <key...>          add keys to the dedupe ledger
   record <skill> <artifact.json>     diff vs last run, archive, report the delta
   digest <skill> [n=10]              summarise the last n runs
+
+Pursuit commands (work a backlog to a conclusion)
+  enqueue <skill> <id...>            add tasks as pending (idempotent)
+  claim <skill>                      claim the next task (re-serves in-progress; auto-blocks a stalled task)
+  complete <skill> <id>              mark a task done (verified)
+  block <skill> <id> <reason...>     mark a task blocked, WITH a reason
+  progress <skill>                   terminal report: converged | interrupted | working + blocked list
+
+Lifecycle
   halt <skill> [reason...]           stop the loop
   resume <skill>                     clear the halt flag
   reset <skill> --confirm            wipe all state for a skill
@@ -438,6 +670,8 @@ Flags
   --kill-file <path>       gate: halt if this file exists (default <stateDir>/STOP)
   --escalate-on a,b        record: severities that trigger escalation (default critical,high)
   --ignore f1,f2           record: extra fields to treat as volatile
+  --priority <n>           enqueue: task priority (higher = claimed first, default 0)
+  --max-attempts <n>       claim: auto-block a task after this many claims (default 3)
   --confirm                reset: required acknowledgement
 `);
   },
