@@ -2,7 +2,7 @@
 
 All notable changes to this skill collection are documented here.
 
-## [1.2.0] - 2026-07-24
+## [2.0.0] - 2026-07-24
 
 Continual-loop architecture. Skills can now run on a schedule without becoming
 noise — the governing rule is that a loop reports the **delta**, not the report.
