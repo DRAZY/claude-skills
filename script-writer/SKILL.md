@@ -1,7 +1,7 @@
 ---
 name: script-writer
-version: "1.2.0"
-description: Creates ready-to-shoot scripts for YouTube, Shorts, blog, X threads, podcasts, and newsletters — hooks, B-roll cues, CTAs, and word-count targets. USE WHEN write a script, video script, YouTube script, blog draft, thread, podcast outline, newsletter, script this topic, turn this into a video, write the intro. NOT FOR deciding which content to make (use content-plan) or adapting already-published content to other platforms (use social-repurpose).
+version: "1.3.0"
+description: Creates ready-to-shoot scripts for YouTube, Shorts, X threads, podcasts, and newsletters — plus quick blog-post skeletons — hooks, B-roll cues, CTAs, and word-count targets. USE WHEN write a script, video script, YouTube script, blog draft, thread, podcast outline, newsletter, script this topic, turn this into a video, write the intro. NOT FOR full long-form articles (use blog-writer), deciding which content to make (use content-plan), or adapting already-published content to other platforms (use social-repurpose).
 argument-hint: "[topic] [format: youtube|short|blog|thread|podcast|newsletter]"
 allowed-tools:
   - WebSearch
