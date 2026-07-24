@@ -1,7 +1,7 @@
 ---
 name: content-review
-version: "1.0.0"
-description: Analyzes content performance data (analytics, metrics, engagement) and generates actionable insights. Identifies what worked, what didn't, and feeds recommendations back into content planning.
+version: "1.1.0"
+description: Analyzes content performance data — CSV exports, pasted metrics, or analytics screenshots — and returns what worked, what didn't, and prioritized next actions tied to specific numbers. USE WHEN analytics, performance, metrics, how did my video do, why did this flop, engagement rate, views dropped, what's working, review my numbers, content audit, retention graph. NOT FOR planning upcoming content (use content-plan) or pre-publication SEO (use seo-optimize).
 argument-hint: "[paste metrics, CSV path, or screenshot path]"
 allowed-tools:
   - Read

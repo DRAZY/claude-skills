@@ -1,7 +1,7 @@
 ---
 name: stack-check
-version: "1.1.0"
-description: Audits all project dependencies, frameworks, and runtime versions. Flags outdated, deprecated, EOL, and vulnerable packages with upgrade guidance.
+version: "1.2.0"
+description: Audits every dependency and runtime against the package registries — flagging outdated, deprecated, abandoned, EOL, and vulnerable packages with exact upgrade commands, license risk, and a reproducible health score. USE WHEN dependencies, outdated packages, update my deps, what's out of date, CVE, vulnerable package, upgrade, EOL, deprecated, dependency audit, is my stack current, npm audit. NOT FOR vulnerabilities in your own application code (use secure-review).
 argument-hint: "[optional: project path]"
 allowed-tools:
   - WebSearch

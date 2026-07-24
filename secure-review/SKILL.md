@@ -1,7 +1,7 @@
 ---
 name: secure-review
-version: "1.0.0"
-description: Comprehensive security audit that orchestrates Ghost Security scans plus manual OWASP Top 10 code review, auth analysis, and dependency health checks.
+version: "1.1.0"
+description: Runs a full application security audit — OWASP Top 10 code review, auth and injection analysis, secrets in git history, and dependency health — reporting severity, confidence, CWE, and a working fix per finding. Manual-invoke only. USE WHEN security review, security audit, is this secure, vulnerabilities, OWASP, injection, XSS, IDOR, auth bypass, check for secrets, pentest my code, before I ship. NOT FOR dependency versions alone (use stack-check) or macOS binary analysis (use defense-analyst).
 argument-hint: "[optional: file, directory, or focus area]"
 allowed-tools:
   - Bash

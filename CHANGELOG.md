@@ -33,17 +33,52 @@ noise — the governing rule is that a loop reports the **delta**, not the repor
 
 ### Enhanced Skills
 
-#### `/stack-check` (v1.0.0 -> v1.1.0)
+#### `/stack-check` (v1.1.0 -> v1.2.0)
 - Added Loop Mode (Monitor) — the reference implementation of the monitor archetype
 - Step 2 now runs the bundled deterministic script; web search is demoted to enrichment (breaking changes, uncovered ecosystems) rather than enumeration
 - Added intentional-pin memory across runs, so a pinned package isn't re-flagged every cycle
 - Added backoff guidance: quiet loops widen their own interval
 
-#### `/content-plan` (v1.1.0 -> v1.2.0)
+#### `/content-plan` (v1.2.0 -> v1.3.0)
 - Added Loop Mode (Producer) — the reference implementation of the producer archetype
 - Added seen-ledger integration so a weekly loop never re-suggests a burned topic
 - Documented the ordering rule (`remember` after delivery, never before) and ledger-key discipline
 - Added running-dry handling: surface the shortage instead of padding the calendar with repeats
+## [1.2.0] - 2026-07-24
+
+Description-discipline pass. Claude auto-invokes a skill from its `description`
+field alone, so every one now states what it does, the trigger phrases a user
+would actually type (`USE WHEN ...`), and which neighbouring skill owns the
+adjacent job (`NOT FOR ... (use other-skill)`). This is the single biggest
+reliability improvement to auto-invocation, and it disambiguates the overlapping
+content skills (content-plan vs script-writer vs social-repurpose vs
+seo-optimize vs content-review) and security skills (secure-review vs
+stack-check vs defense-analyst vs red-team-scaffold) from each other.
+
+### Changed
+- Rewrote the `description` frontmatter on all 15 skills to the `USE WHEN` /
+  `NOT FOR` contract. Every cross-reference points to a skill that exists; every
+  description stays under the 1024-character limit.
+- Minor version bump on all 15 skills (a description change alters
+  auto-invocation behaviour).
+- README "Creating Your Own" now documents the description contract, including
+  the YAML gotcha that a bare `: ` inside the value breaks parsing.
+
+## [1.1.1] - 2026-07-24
+
+Correctness and repo-hygiene pass. No behavioral changes to skill logic.
+
+### Fixed
+- **`/claude-api` (v1.0.0 -> v1.0.1)** — Replaced dead model IDs. `claude-sonnet-4-6` and `claude-opus-4-6` do not exist; every code example, the model table, and the default-model rule now use the current lineup (Opus 4.8 / Sonnet 5 / Haiku 4.5) with real context windows and pricing.
+- **`/claude-api`** — The extended-thinking example used `thinking: {type: "enabled", budget_tokens: N}`, which is **removed on Opus 4.8/4.7 and returns a 400**. Replaced with adaptive thinking plus `output_config.effort`, and documented that `display` defaults to `"omitted"`.
+- **`/claude-api`** — Corrected the Batch API call path: `client.batches.create()` -> `client.messages.batches.create()`.
+- **`/mastra-expert`** — Updated stale Anthropic model examples (`anthropic/claude-4-5-sonnet`) to a real ID.
+- **`README.md`** — Quick Start and Installation pointed at two different GitHub URLs; both now match the actual remote.
+- **`/social-repurpose`** — Platform section numbering skipped 5 (went 1,2,3,4,6,7,8,9); renumbered 1-8.
+
+### Added
+- `LICENSE` — MIT, matching the license the README already claimed.
+- `.gitignore` — was absent, which is why a `node_modules` tree was sitting loose in the working directory.
 
 ## [1.1.0] - 2026-03-06
 

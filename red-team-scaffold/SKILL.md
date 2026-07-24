@@ -1,7 +1,7 @@
 ---
 name: red-team-scaffold
-version: "1.0.0"
-description: Scaffolds GenAI red team testing infrastructure — exfiltration detection servers, intentionally vulnerable MCP servers, and sandboxed code execution environments. For defensive security research only.
+version: "1.1.0"
+description: Scaffolds GenAI red-team testing infrastructure — exfiltration-detection servers, intentionally vulnerable MCP servers, and monitored code-execution sandboxes — all Docker-isolated, fake-data-only, with production guards. Defensive research only. Manual-invoke — it creates infrastructure. USE WHEN red team lab, test environment, vulnerable MCP server, exfil server, sandbox, agent security testing, LLM security harness, prompt injection testbed, build a testing rig. NOT FOR analyzing the findings it produces (use defense-analyst) or auditing a real application (use secure-review).
 argument-hint: "[component: exfil-server|mcp-vuln|sandbox|full] [optional: stack preferences]"
 allowed-tools:
   - Bash

@@ -1,7 +1,7 @@
 ---
 name: mastra-expert
-version: "1.0.0"
-description: Expert-level guidance for Mastra AI framework — agents, workflows, memory, RAG, MCP, tools, voice, models, evals, observability, server, and deployment. USE WHEN building Mastra apps, creating agents, designing workflows, configuring memory, setting up RAG pipelines, integrating MCP servers, adding voice, routing models, writing evals, or deploying to cloud.
+version: "1.1.0"
+description: Expert guidance for the Mastra TypeScript AI framework — agents, workflows, memory, RAG, MCP, tools, voice, model routing, evals, observability, and deployment. USE WHEN Mastra, createWorkflow, createStep, createTool, MCPClient, Mastra agent, mastra dev, mastra build, suspend resume workflow, vector store, agent network, deploy Mastra. NOT FOR the raw Claude API or Anthropic SDK (use claude-api) or general project scaffolding (use app-scaffold).
 argument-hint: "[task or question about Mastra]"
 allowed-tools:
   - WebSearch
@@ -116,7 +116,7 @@ User: "Deploy my Mastra app to Vercel"
 ```typescript
 // Direct provider: "provider/model-name"
 model: "openai/gpt-5.1"
-model: "anthropic/claude-4-5-sonnet"
+model: "anthropic/claude-opus-4-8"
 model: "google/gemini-2.5-flash"
 
 // Gateway: "gateway/provider/model"
@@ -133,7 +133,7 @@ model: ({ requestContext }) => requestContext.get("tier") === "enterprise"
 // Fallbacks
 model: [
   { model: "openai/gpt-5", maxRetries: 3 },
-  { model: "anthropic/claude-4-5-sonnet", maxRetries: 2 },
+  { model: "anthropic/claude-opus-4-8", maxRetries: 2 },
 ]
 ```
 

@@ -1,7 +1,7 @@
 ---
 name: seo-optimize
-version: "1.1.0"
-description: Optimizes content titles, descriptions, tags, and keywords for YouTube, blog, podcast, and GitHub repo SEO. Suggests A/B variants and trending angles.
+version: "1.2.0"
+description: Optimizes titles, descriptions, tags, and keywords for YouTube, blog, podcast, and GitHub repos — with before/after comparison, competition analysis, and A/B variants. USE WHEN SEO, optimize title, better title, keywords, tags, meta description, improve CTR, rank higher, title variants, thumbnail text, repo discoverability. NOT FOR writing the content itself (use script-writer) or analyzing how published content performed (use content-review).
 argument-hint: "[title or draft content] [platform: youtube|blog|podcast|github]"
 allowed-tools:
   - WebSearch

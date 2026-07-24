@@ -1,7 +1,7 @@
 ---
 name: social-repurpose
-version: "1.1.0"
-description: Transforms long-form content into platform-optimized posts for Twitter/X, Bluesky, Threads, LinkedIn, Reddit, Instagram, TikTok, and newsletters.
+version: "1.2.0"
+description: Transforms one long-form piece into native posts for X, Bluesky, Threads, LinkedIn, Reddit, Instagram, TikTok, and newsletters — each leading with a different angle, character limits enforced. USE WHEN repurpose, cross-post, turn this into posts, promote this, distribute, adapt for LinkedIn, make a thread from this, social posts from my blog, share this everywhere. NOT FOR writing original long-form content (use script-writer) or scheduling a week of new content (use content-plan).
 argument-hint: "[file path or paste content directly]"
 allowed-tools:
   - Read
@@ -150,7 +150,7 @@ If the source is a **video transcript** with `[B-ROLL]`, `[SCREEN RECORDING]`, o
 
 ---
 
-#### 6. Reddit Post
+#### 5. Reddit Post
 
 ```
 **Title:** [Descriptive, not clickbaity — Reddit downvotes hype]
@@ -183,7 +183,7 @@ If the source is a **video transcript** with `[B-ROLL]`, `[SCREEN RECORDING]`, o
 
 ---
 
-#### 7. Instagram/TikTok Caption + Carousel Concept
+#### 6. Instagram/TikTok Caption + Carousel Concept
 
 **Caption:**
 ```
@@ -210,7 +210,7 @@ If the source is a **video transcript** with `[B-ROLL]`, `[SCREEN RECORDING]`, o
 
 ---
 
-#### 8. YouTube Shorts / TikTok Script (30-60 sec)
+#### 7. YouTube Shorts / TikTok Script (30-60 sec)
 
 ```
 HOOK (0-2 sec): "[Bold opening line]"
@@ -229,7 +229,7 @@ CLOSE (45-60 sec): "[Memorable line]"
 
 ---
 
-#### 9. Newsletter Snippet
+#### 8. Newsletter Snippet
 
 **Subject lines (3 options):**
 1. [Curiosity-driven]

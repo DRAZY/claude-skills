@@ -691,7 +691,7 @@ For content performance optimization:
 
 ### Fresh Install
 ```bash
-git clone https://github.com/andre-zilla/claude-skills.git ~/.claude/skills
+git clone https://github.com/DRAZY/claude-skills.git ~/.claude/skills
 ```
 
 ### Sync Across Machines
@@ -717,7 +717,10 @@ mkdir ~/.claude/skills/my-skill
 ```yaml
 ---
 name: my-skill
-description: What it does and when to use it
+description: >
+  What it does, in one sentence.
+  USE WHEN <trigger phrases a user would actually type>.
+  NOT FOR <the adjacent job> (use other-skill).
 argument-hint: "[args]"
 allowed-tools:
   - WebSearch
@@ -726,6 +729,12 @@ allowed-tools:
 
 Your instructions here...
 ```
+
+**Write the description for the router, not the reader.** Claude decides whether to
+auto-invoke a skill from the `description` field alone — so front-load the trigger
+words someone would type, and add a `NOT FOR ... (use other-skill)` clause to
+disambiguate from neighbouring skills. Third person, under 1024 characters. Avoid a
+bare `: ` inside the value (it breaks YAML parsing) — use ` — ` instead.
 
 ### Key Frontmatter Options
 

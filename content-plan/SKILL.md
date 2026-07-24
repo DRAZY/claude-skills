@@ -1,7 +1,7 @@
 ---
 name: content-plan
-version: "1.2.0"
-description: Generates a weekly content calendar with topics, titles, platforms, hooks, and posting schedule for a tech/AI content creator. Supports YouTube, Twitter/X, LinkedIn, Bluesky, Threads, Mastodon, TikTok, Blog, and Newsletter.
+version: "1.3.0"
+description: Generates a weekly content calendar — topics, titles, platforms, hooks, and posting times — for a tech/AI creator, researched against current trends. USE WHEN content calendar, content plan, what should I post, plan my week, weekly schedule, editorial calendar, posting schedule, content strategy, what to make next. NOT FOR writing the script itself (use script-writer), optimizing a finished title (use seo-optimize), or splitting published content across platforms (use social-repurpose).
 argument-hint: "[topic focus] [optional: week of MM/DD]"
 allowed-tools:
   - WebSearch
