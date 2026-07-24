@@ -2,6 +2,14 @@
 
 All notable changes to this skill collection are documented here.
 
+## [2.1.0] - 2026-07-24
+
+### New Skills
+- **`/blog-writer`** (v1.0.0) — Writes a complete, publish-ready long-form article on any topic through a real five-stage process (angle → research with source verification → outline → full draft → self-edit), not a one-pass skeleton. Ships 8 post archetypes (tutorial, explainer, opinion, listicle, review, case study, news analysis, personal essay), each with a genre-appropriate structure, and a dedicated **anti-AI-slop edit pass** that strips "in today's landscape," corporate vocabulary, robotic three-part rhythm, restate-the-intro conclusions, and em-dash overuse. Verifies facts/stats/quotes via WebSearch (never invents a source), outputs clean CommonMark that pastes anywhere, and includes word count, sources with dates, headline options, and one honest "what I'd sharpen next" note.
+
+### Changed
+- **`/script-writer` (v1.2.0 -> v1.3.0)** — Retargeted its blog boundary now that `blog-writer` owns long-form. It keeps quick blog-post skeletons; its `NOT FOR` now routes full articles to `blog-writer`, and its description reflects the split. No change to its video/thread/podcast/newsletter formats.
+
 ## [2.0.0] - 2026-07-24
 
 Continual-loop architecture. Skills can now run on a schedule without becoming
