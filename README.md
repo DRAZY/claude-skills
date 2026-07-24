@@ -1,6 +1,6 @@
 # Claude Code Custom Skills
 
-A production-grade collection of 15 custom [Claude Code](https://claude.ai/claude-code) skills for content creation, AI development, security auditing, defensive research, community management, and AI framework expertise.
+A production-grade collection of custom [Claude Code](https://claude.ai/claude-code) skills for content creation, AI development, AI security research, security auditing, defensive research, community management, and AI framework expertise — several of which run as continual, loop-aware workflows.
 
 These skills use advanced Claude Code features including `context: fork` for isolated execution, `allowed-tools` for precise tool access, dynamic context injection (`!`command``), skill chaining, and structured output templates.
 
@@ -40,6 +40,9 @@ git clone https://github.com/DRAZY/claude-skills.git ~/.claude/skills
 | [`/defense-analyst`](#defense-analyst) | Security | macOS binary analysis, CVSS scoring, defensive tools, vuln reports |
 | [`/red-team-scaffold`](#red-team-scaffold) | Security | GenAI red team infra — exfil server, vulnerable MCP, sandbox |
 | [`/mastra-expert`](#mastra-expert) | Development | Mastra AI framework — agents, workflows, memory, RAG, MCP, voice, evals, deployment |
+| [`/prompt-injection-probe`](#ai-security-research) | AI Security | Pursuit-loop injection/jailbreak/extraction battery against an authorized target, canary-scored |
+| [`/vuln-triage`](#ai-security-research) | AI Security | Pursuit-loop GenAI bug-bounty triage — validity, dedup, severity, CVSS, researcher response |
+| [`/disclosure-writer`](#ai-security-research) | AI Security | Coordinated responsible-disclosure package — report, timeline, remediation, optional CVE draft |
 | [`/loop-runner`](#continual-loops) | Automation | Runs loop-enabled skills continually — state, dedupe, deltas, stop conditions |
 
 ---
@@ -502,6 +505,51 @@ Community management assistant. Default profile: [0DIN.ai](https://0din.ai) GenA
 
 ---
 
+## AI Security Research
+
+Three skills for the GenAI security lifecycle — find, triage, disclose. The first two are **Pursuit loops**: they work a backlog (a probe corpus, a submission queue) to a stated conclusion and never quit mid-backlog without reporting what remains. All three are strictly defensive and authorization-gated, and their loop state is gitignored because it describes unfixed vulnerabilities.
+
+### `/prompt-injection-probe`
+
+Stress-tests a system prompt or agent definition **you own or are authorized to test** with a structured battery of prompt-injection, indirect-injection, jailbreak, system-prompt-extraction, guardrail-bypass, encoding-smuggle, tool-abuse, multi-turn, and context-manipulation probes. Manual-invoke.
+
+```
+/prompt-injection-probe ./my-agent-system-prompt.md
+/prompt-injection-probe ./agent.md --focus extraction
+```
+
+- **Canary principle** — proves a guardrail failed with a benign marker, never by generating harmful content
+- **Pursuit loop** — each probe worked to a `HELD` / `BYPASSED` / `PARTIAL` verdict; converges when the corpus is exhausted
+- **Root-cause clustering** — 3 bypasses usually share 1 fix; the report leads with bypasses, never buries them
+- The "run the tests" counterpart to `/red-team-scaffold`'s "build the lab"
+
+### `/vuln-triage`
+
+Triages GenAI bug-bounty submissions one at a time — validity, duplicate-by-root-cause, severity, CVSS-adapted score, reproduction quality, category, and a drafted researcher response.
+
+```
+/vuln-triage ./submissions/
+/vuln-triage ./SUB-0501.md --program "0DIN GenAI"
+```
+
+- **Pursuit loop** over the submission queue; a submission is triaged (done) or blocked-with-reason, never silently dropped
+- AI-native taxonomy: prompt injection, jailbreak, data leakage, unbounded consumption, tool abuse
+- Escalates criticals immediately; dedups on root cause, not wording; drafts honest researcher-facing responses
+
+### `/disclosure-writer`
+
+Turns a confirmed finding into a **coordinated** (not full) disclosure package — report, reproduction, impact, remediation, disclosure timeline, and an optional CVE-request draft.
+
+```
+/disclosure-writer ./probe-report.md --vendor "Acme" --cve
+```
+
+- Coordinated posture: vendor first, public later, remediation window respected
+- De-fanged public artifacts — informs defenders without shipping a turnkey attack
+- Flags when CVSS/CVE fit an AI-behavior finding poorly and routes to the vendor's AI-vuln channel instead
+
+---
+
 ## AI Framework Skills
 
 ### `/mastra-expert`
@@ -607,6 +655,19 @@ For defensive security research:
 /stack-check            → Verify all dependency versions
     ↓
 /script-writer          → Create content about the research
+```
+
+For GenAI security research (find → triage → disclose):
+```
+/red-team-scaffold      → Build the testing lab
+    ↓
+/prompt-injection-probe → Run the probe battery against an authorized target (Pursuit loop)
+    ↓
+/vuln-triage            → Triage findings / incoming submissions (Pursuit loop)
+    ↓
+/disclosure-writer      → Coordinated responsible-disclosure package
+    ↓
+/community-manager      → Researcher recognition + disclosure comms
 ```
 
 For content performance optimization:
