@@ -1,7 +1,7 @@
 ---
 name: claude-api
-version: "1.0.1"
-description: Build apps with the Claude API or Anthropic SDK. Guides through authentication, model selection, tool use, streaming, vision, prompt caching, batch API, and Agent SDK patterns.
+version: "1.1.0"
+description: Builds applications with the Claude API and Anthropic SDKs — model selection, streaming, tool use, vision, prompt caching, batch API, and agent loops — verifying current model IDs and SDK versions before writing code. USE WHEN Claude API, Anthropic SDK, anthropic import, claude-opus, messages.create, prompt caching, tool use, streaming, batch API, agent loop, which Claude model, adaptive thinking. NOT FOR OpenAI, Gemini, or other providers, or for the Mastra framework (use mastra-expert).
 argument-hint: "[task or question about Claude API]"
 allowed-tools:
   - WebSearch

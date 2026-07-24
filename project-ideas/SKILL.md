@@ -1,7 +1,7 @@
 ---
 name: project-ideas
-version: "1.1.0"
-description: Generates buildable AI/tech project ideas with tech stack, content angles, difficulty levels, and monetization potential. Checks existing projects to avoid duplicates.
+version: "1.2.0"
+description: Generates buildable AI/tech project ideas with verified stacks, difficulty, build time, content angle, and monetization potential — checking your existing projects to avoid duplicates. USE WHEN project ideas, what should I build, side project, weekend project, build something, need an idea, portfolio project, app idea, what to build next. NOT FOR scaffolding a project you have already chosen (use app-scaffold).
 argument-hint: "[difficulty] [stack] [topic] [exclude: ...]"
 allowed-tools:
   - WebSearch
