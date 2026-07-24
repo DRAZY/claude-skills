@@ -41,7 +41,7 @@ git clone https://github.com/DRAZY/claude-skills.git ~/.claude/skills
 | Skill | Category | Key Features |
 |---|---|---|
 | [`/content-plan`](#content-plan) | Content | WebSearch for trends, 9 platforms (incl. Bluesky/Threads/Mastodon), analytics-informed planning, **Producer loop mode** (never repeats a topic) |
-| [`/blog-writer`](#blog-writer) | Content | Full long-form articles on any topic — 5-stage process (angle→research→outline→draft→edit), 8 archetypes, anti-AI-slop edit pass |
+| [`/blog-writer`](#blog-writer) | Content | Full long-form articles on any topic — 5-stage process, 10 archetypes (incl. security walkthrough + market analysis), length tiers, personal/work voice, anti-AI-slop edit pass |
 | [`/script-writer`](#script-writer) | Content | Scripts for youtube, short, thread, podcast, newsletter + quick blog skeletons; code tutorial variant, word-count targets |
 | [`/seo-optimize`](#seo-optimize) | Content | 4 platforms (youtube, blog, podcast, github), before/after comparison, keyword research, volume disclaimers |
 | [`/social-repurpose`](#social-repurpose) | Content | 8 platforms (incl. Bluesky, Threads, Reddit), hard character limits, de-duplication, posting schedule |
@@ -215,10 +215,12 @@ Writes a complete, publish-ready long-form article on **any topic** — not a sk
 
 **What's included:**
 - A real **five-stage process**, not one pass: angle → research (with source verification) → outline → full draft → self-edit
-- **8 post archetypes**, each with a structure that fits the genre: tutorial, explainer, opinion, listicle, review, case study, news analysis, personal essay
+- **10 post archetypes**, each with a structure that fits the genre: tutorial, **security walkthrough / vulnerability writeup**, explainer, opinion, **market / industry analysis**, review, case study, news analysis, listicle, personal essay
+- **Length tiers** — short (~600–1,000) to definitive (4,000+); depth fits the topic, never padded to a count
+- **Personal vs work voice** — first-person and opinionated for your own site, measured and org-representing for a company/program blog
+- **Responsible-disclosure lens** for security research — mechanism + detection + fix, canaries over live payloads, no turnkey exploits; hands off to `/prompt-injection-probe`, `/vuln-triage`, or `/disclosure-writer` when the underlying work lives there
 - **Anti-AI-slop edit pass** — strips "in today's landscape," corporate vocabulary, robotic three-part rhythm, restate-the-intro conclusions, and em-dash overuse
 - Fact/stat/quote verification via WebSearch (never invents a source); specificity over adjectives
-- Correct, copy-pasteable, *explained* code in technical posts
 - Clean CommonMark that pastes anywhere; adds MDX/frontmatter or platform conventions on request
 - Ships with word count + reading time, sources with dates, 3 headline options, and one honest "what I'd sharpen next" note
 

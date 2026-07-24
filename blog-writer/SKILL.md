@@ -1,18 +1,19 @@
 ---
 name: blog-writer
-version: "1.0.0"
+version: "1.1.0"
 description: >
-  Writes a complete, publish-ready long-form blog post on any topic through a real process —
-  angle, research with source verification, outline, full draft, and a self-edit pass that strips
-  AI-slop. Adapts structure to the post type (tutorial, explainer, opinion, listicle, review,
-  case study, news analysis, personal essay). Outputs clean Markdown.
+  Writes a complete, publish-ready long-form blog post on any topic — from short takes to deep
+  in-depth pieces — through a real process: angle, source-verified research, outline, full draft,
+  and a self-edit pass that strips AI-slop. Adapts structure to the post type (tutorial, security
+  walkthrough, explainer, opinion, market analysis, review, case study, news, listicle, essay) with
+  a responsible-disclosure lens for security research. Outputs clean Markdown.
   USE WHEN write a blog post, blog article, long-form, write an article, draft a post, blog about,
-  turn this into a blog, technical writeup, explainer, tutorial post, opinion piece, essay, first
-  draft, edit my post, make this less AI-sounding.
+  technical writeup, security walkthrough, vulnerability writeup, market analysis, explainer,
+  tutorial, opinion piece, edit my post, make this less AI-sounding.
   NOT FOR short video/thread/newsletter scripts (use script-writer), optimizing a finished title or
   tags (use seo-optimize), splitting a post across social platforms (use social-repurpose), or
   scheduling what to write next (use content-plan).
-argument-hint: "[topic or title] [optional: --type tutorial|explainer|opinion|listicle|review|case-study|news|essay] [optional: --words N]"
+argument-hint: "[topic or title] [--type tutorial|walkthrough|explainer|opinion|analysis|review|case-study|news|listicle|essay] [--length short|standard|deep|definitive] [--target personal|work]"
 allowed-tools:
   - WebSearch
   - Read
@@ -95,9 +96,22 @@ Do a real edit pass on the draft. This is not optional; it's where the quality i
 
 Then check: does it deliver the promise from step 1? Is the one idea unmistakable? Would a smart friend find it genuinely useful, or just competent? Tighten until yes.
 
+## Length tiers (`--length`, or judge from the topic)
+
+Depth should fit the topic and the reader's need, not a fixed count. Pick a tier:
+
+| Tier | Words | When |
+|---|---|---|
+| **short** | ~600–1,000 | A single sharp take, a quick tip, a timely reaction. Say one thing well and stop. |
+| **standard** | ~1,200–2,000 | The default. A full treatment of one angle with room for examples. |
+| **deep** | ~2,500–4,000 | An in-depth piece — a real tutorial, a full walkthrough, a thorough analysis. |
+| **definitive** | ~4,000+ | The "one link people send" reference. Only when the topic genuinely earns it; never padded to length. |
+
+Length serves the reader, never the word count. A tight 900-word post beats a bloated 3,000-word one. If a topic doesn't have 2,000 words of real substance, write the 900 and say so.
+
 ## Post archetypes (pick by `--type`, or infer from the topic)
 
-Adapt the structure to what kind of post this is. Default target ~1,200–2,000 words; override with `--words`.
+Adapt the structure to what kind of post this is.
 
 ### Tutorial / How-to
 Teach the reader to do a specific thing. Structure: what we're building + the finished result up front → prerequisites → numbered steps, each with the action, the code/commands, and *what's happening and why* → "common errors" → testing it → where to go next. Correct, copy-pasteable code is non-negotiable.
@@ -119,6 +133,12 @@ A real thing that happened, mined for a lesson. Structure: the situation and the
 
 ### News analysis
 Not just what happened — what it means. Structure: the news, briefly (assume they can get the facts elsewhere) → why it matters → your analysis / the second-order effects most coverage misses → what to watch next. Add the angle, not the recap.
+
+### Security walkthrough / vulnerability writeup
+Walk the reader through a finding or technique — for defenders, not attackers. Structure: what the issue is and why it matters (impact first) → the affected system / context → how it works, step by step, at the depth the lesson needs → the root cause → **detection and remediation** (this is the payoff — how to find it, how to fix it, how to defend) → responsible-disclosure notes (timeline, coordination) where relevant. Keep it **defensive**: explain the mechanism and the fix, use canaries/benign markers over live payloads, and never ship a turnkey exploit. This is the format for AI-security and general security research — pair it with `/prompt-injection-probe`, `/vuln-triage`, or `/disclosure-writer` when the underlying work lives in those skills.
+
+### Market / industry analysis
+Map a landscape and say something about it. Structure: the question the piece answers (where's this market going? who's winning? what changed?) → the current state, grounded in real data, players, and numbers (verify all of it) → the forces driving it → your read: the trend most people are missing, or where you think it goes → what it means for the reader (builder, buyer, researcher). The value is judgment on top of facts — a data dump isn't analysis. Flag your predictions as predictions.
 
 ### Personal essay
 Idea through experience. Structure: an opening moment or image that pulls the reader in → the thread of thought → let it wander with purpose → arrive somewhere earned, not tidy. Voice carries this one; be specific and honest.
@@ -153,7 +173,16 @@ Also provide, briefly, after the post:
 - **3 headline options** (the one you used + 2 alternates) — a working headline, not final SEO.
 - **What I'd sharpen next** — one honest note on where the post is weakest, so the user can push on it.
 
-Portability: default to plain CommonMark that pastes anywhere. If the user names a platform or static-site setup (Astro, Next/MDX, Hugo, Dev.to, Medium, Substack), add the frontmatter or platform conventions they use — ask which if it's not obvious and it matters.
+## Publishing target (`--target`, or ask)
+
+Voice and framing shift depending on where the post lives. Default to **personal** if unspecified; ask only if it materially changes the piece.
+
+| Target | Voice | Framing |
+|---|---|---|
+| **personal** | First person, your own point of view, opinions welcome | Your site or personal blog — you can be direct, take positions, and speak as yourself. |
+| **work** | Professional and organizational, "we" where natural, credibility-first | A company or program blog (e.g. a security-research or bug-bounty program blog). Represent the org, keep claims tight and sourced, stay measured. Security content leans responsible-disclosure by default. |
+
+Ask for the exact output format only when it matters: default to plain **CommonMark** that pastes anywhere; add YAML frontmatter or platform conventions (Astro, Next/MDX, Hugo, Dev.to, Medium, Substack) if the user names their setup. When you don't know the site's format, deliver clean Markdown and note that frontmatter can be added on request.
 
 ## Rules
 - Do all five stages — angle, research, outline, draft, edit. The edit pass is where the quality lives.
@@ -163,12 +192,15 @@ Portability: default to plain CommonMark that pastes anywhere. If the user names
 - Run the anti-slop edit pass every time — no "in today's landscape," no corporate vocabulary, no robotic rhythm.
 - Correct, copy-pasteable, explained code — verify commands and versions.
 - Match the structure to the archetype; don't force one skeleton onto every post.
+- Match length to substance, not a target — a tight short post beats a padded long one.
+- Security and research posts stay defensive: mechanism + detection + fix, responsible-disclosure framing, no turnkey exploits.
+- Match voice to the target — first-person and opinionated for a personal site, measured and org-representing for a work blog.
 - End the post with a thought, not a summary of itself.
 
 ## Edge Cases
 - **No topic given:** Ask for one and offer 3 angle options once you have it.
 - **Topic too broad:** Narrow to one arguable angle, say which you chose, and why.
-- **Sensitive/security topic:** Keep it defensive and responsible — explain risk and defense, not a weaponized how-to; source claims carefully.
+- **Security research / vulnerability topic:** Use the security-walkthrough archetype — lead with impact, land on detection and remediation, keep it defensive (canaries over live payloads, no turnkey exploit), and add responsible-disclosure notes. Route to `/prompt-injection-probe`, `/vuln-triage`, or `/disclosure-writer` if the underlying work belongs there.
 - **Time-sensitive topic:** Note the date and flag what may age out, so the post can be updated later.
 - **User pastes a rough draft:** Skip to the edit pass — run the anti-slop and structure edit on what they have, and tell them what you changed and why.
 - **Thin research surface (niche topic):** Say so honestly; write from reasoning and clearly-marked opinion rather than faking sources.
