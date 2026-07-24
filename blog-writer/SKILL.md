@@ -1,18 +1,18 @@
 ---
 name: blog-writer
-version: "1.4.0"
+version: "1.5.0"
 description: >
-  Universal long-form blog writer for any field or topic — short takes to deep pieces. Interviews
-  the writer to nail the angle, matches their voice from a sample or style file so it reads like
-  them (not generic AI), then runs a real process: source-verified research, outline, draft,
-  anti-AI-slop edit, and surgical revision. Adapts to the post type — tutorial, explainer, opinion,
-  review, listicle, case study, news, market analysis, essay, or technical/security walkthrough.
+  Universal long-form blog writer for any field or topic — short takes to deep multi-part series.
+  Interviews the writer to nail the angle, matches their voice from a sample so it reads like them
+  (not generic AI), then runs a real process: source-verified research, outline, draft, anti-AI-slop
+  edit, and surgical revision — with headline craft and a series mode for oversized topics. Adapts
+  to the post type — tutorial, explainer, opinion, review, listicle, case study, news, analysis, essay.
   USE WHEN write a blog post, blog article, long-form, write an article, draft a post, blog about,
-  explainer, tutorial, how-to, opinion piece, essay, review, listicle, thought leadership,
-  technical writeup, match my writing voice, edit my post, make this less AI-sounding, revise my post.
-  NOT FOR short video/thread/newsletter scripts (use script-writer), optimizing a finished title or
-  tags (use seo-optimize), splitting a post across social platforms (use social-repurpose), or
-  scheduling what to write next (use content-plan).
+  explainer, tutorial, how-to, opinion piece, essay, review, listicle, thought leadership, headline,
+  blog series, technical writeup, match my writing voice, edit my post, make this less AI-sounding.
+  NOT FOR short video/thread/newsletter scripts (use script-writer), SEO on a finished title or tags
+  (use seo-optimize), splitting a post across social platforms (use social-repurpose), or scheduling
+  what to write next (use content-plan).
 argument-hint: "[topic or title] [--type tutorial|explainer|opinion|review|listicle|case-study|news|market-analysis|walkthrough|essay] [--length short|standard|deep|definitive] [--target personal|work]"
 allowed-tools:
   - WebSearch
@@ -156,6 +156,18 @@ Depth should fit the topic and the reader's need, not a fixed count. Pick a tier
 
 Length serves the reader, never the word count. A tight 900-word post beats a bloated 3,000-word one. If a topic doesn't have 2,000 words of real substance, write the 900 and say so.
 
+### When it's really a series
+
+Sometimes a topic is too big for one post — a `definitive` piece that's straining, or a subject with three genuinely separate parts (setup, then usage, then advanced). Don't force it into one exhausting article. Say so, and propose a **series**: 2–4 posts, each standing on its own but building toward the whole.
+
+If the writer wants the series, structure it so it works as a set:
+- **Each part is self-contained** — a reader landing on part 2 from search still gets a complete, useful post. Don't rely on "as we saw in part 1."
+- **Connective tissue** — a one-line "this is part 2 of 4" note, a link back to the prior part and forward to the next, and a consistent title pattern (e.g. "Building X, Part 2: …").
+- **A real arc** — the parts should have an order that builds, not just chunks of one post split at arbitrary lengths.
+- **Write one at a time** — draft the part in front of you fully; sketch the rest as a short outline so the writer sees the shape. Offer to write the next part when they're ready.
+
+Default to a single post. Only propose a series when the topic genuinely needs it — a series is a bigger commitment for both writer and reader.
+
 ## Post archetypes (pick by `--type`, or infer from the topic)
 
 Adapt the structure to what kind of post this is.
@@ -219,9 +231,23 @@ Deliver the finished post as clean Markdown:
 Also provide, briefly, after the post:
 - **Word count** and reading time.
 - **Sources** used (with the dates you verified them).
-- **3 headline options** (the one you used + 2 alternates) — a working headline, not final SEO.
+- **3 headline options** — the one you used plus 2 alternates, each a genuinely different angle (see Headline craft below), not three rewordings of the same line.
 - **What I'd sharpen next** — one honest note on where the post is weakest, so the user can push on it.
 - **An invitation to revise** — tell them what kinds of changes you can make (tighten, retone, go deeper, cut, restructure) so it's clear this is a draft to work, not a finished handoff.
+
+## Headline craft
+
+The headline does two jobs at once: earn the click *and* keep the promise. A great post under a flat headline goes unread; a clickbait headline over a good post burns trust. Aim for the honest overlap.
+
+A working headline usually has some of:
+- **Specificity** — a real number, name, or concrete outcome beats a vague noun. "How I cut our build from 40s to 6s" over "Improving build performance."
+- **A curiosity gap that pays off** — hint at the surprise, don't spoil it — but only if the post actually delivers it. Never promise what the piece doesn't contain.
+- **A clear promise or stake** — the reader should know what they get or why they should care.
+- **The reader's own words** — phrases they'd actually search or say, not internal jargon.
+
+Give the **3 options as distinct angles**, not variations: e.g. one benefit-driven ("Cut your build time by 85%"), one curiosity/contrarian ("The build setting nobody mentions"), one plain-and-clear ("How we sped up our CI pipeline"). Note which you'd pick and why. Flag the honest-vs-clickbait tension when it exists: show the punchier option, but say if it overpromises.
+
+This is headline *writing* craft — does the line make someone click and does it stay honest. It is **not** SEO: for keyword placement, character limits, meta descriptions, and search competition, hand off to `/seo-optimize`.
 
 ## Publishing target (`--target`, or ask)
 
@@ -246,7 +272,8 @@ Ask for the exact output format only when it matters: default to plain **CommonM
 - Run the anti-slop edit pass every time — no "in today's landscape," no corporate vocabulary, no robotic rhythm.
 - Correct, copy-pasteable, explained code — verify commands and versions.
 - Match the structure to the archetype; don't force one skeleton onto every post.
-- Match length to substance, not a target — a tight short post beats a padded long one.
+- Match length to substance, not a target — a tight short post beats a padded long one. When a topic is too big for one post, propose a series rather than bloating one article.
+- Give headlines that earn the click and keep the promise — 3 distinct angles, not 3 rewordings; flag any option that overpromises. Headline *writing*, not SEO (that's `/seo-optimize`).
 - *When* a post is a security writeup, keep it defensive: mechanism + detection + fix, responsible-disclosure framing, no turnkey exploits. (This applies only to that case — most posts never touch it.)
 - Match voice to the target — first-person and opinionated for a personal site, measured and org-representing for a work blog.
 - End the post with a thought, not a summary of itself.
@@ -256,6 +283,7 @@ Ask for the exact output format only when it matters: default to plain **CommonM
 - **Topic given, but thin on context:** This is the norm — run the clarifying interview (3–6 questions) before drafting. That's the whole point: turn a bare angle into a well-formed brief.
 - **User says "just write it" / "you decide":** Proceed on your best read, but state the key assumptions you made (audience, angle, length, voice) so they can redirect after seeing the draft.
 - **Topic too broad:** Narrow to one arguable angle, say which you chose, and why.
+- **Topic too big for one post:** Propose a series (2–4 self-contained, building parts) instead of one bloated article; write the first part fully and outline the rest. See "When it's really a series."
 - **Sensitive topic (security, legal, medical, financial advice, etc.):** Handle with care appropriate to the field — accurate, sourced, and framed responsibly. For security/vulnerability writeups specifically: use the technical-walkthrough archetype's security sub-case (impact → detection → remediation, defensive, no turnkey exploit), and route to `/prompt-injection-probe`, `/vuln-triage`, or `/disclosure-writer` if the underlying work belongs there.
 - **Time-sensitive topic:** Note the date and flag what may age out, so the post can be updated later.
 - **User pastes a rough draft:** Skip to the edit pass — run the anti-slop and structure edit on what they have, and tell them what you changed and why.
