@@ -1,12 +1,12 @@
 ---
 name: blog-writer
-version: "1.1.0"
+version: "1.2.0"
 description: >
-  Writes a complete, publish-ready long-form blog post on any topic — from short takes to deep
-  in-depth pieces — through a real process: angle, source-verified research, outline, full draft,
-  and a self-edit pass that strips AI-slop. Adapts structure to the post type (tutorial, security
-  walkthrough, explainer, opinion, market analysis, review, case study, news, listicle, essay) with
-  a responsible-disclosure lens for security research. Outputs clean Markdown.
+  Writes a complete, publish-ready long-form blog post on any topic, short takes to deep pieces.
+  Starts by interviewing the writer with sharp clarifying questions to nail the angle, then runs a
+  real process: source-verified research, outline, draft, and a self-edit pass that strips AI-slop.
+  Adapts to the post type (tutorial, security walkthrough, explainer, opinion, market analysis,
+  review, case study, news, listicle, essay) with a responsible-disclosure lens for security work.
   USE WHEN write a blog post, blog article, long-form, write an article, draft a post, blog about,
   technical writeup, security walkthrough, vulnerability writeup, market analysis, explainer,
   tutorial, opinion piece, edit my post, make this less AI-sounding.
@@ -38,7 +38,22 @@ Great writing is a process, not a single pass. Work through these in order. For 
 
 ### 1. Angle — find the one thing this post is actually about
 
-Before anything, pin down:
+**Interview the writer first.** When the user hands you a topic or a rough angle, do not just start drafting off assumptions. Ask a short, sharp set of clarifying questions first — the answers are what separate a generic post from *their* post. This is the single highest-leverage step, and it's collaborative: the user knows things about their intent, audience, and experience that no amount of research surfaces.
+
+Ask **3–6 questions, numbered**, tuned to the specific topic (not a boilerplate list). Draw from these dimensions, picking the ones that actually matter for this piece:
+
+- **The core point** — What's the one thing you want the reader to walk away with? Is there a take or opinion you're bringing, or is this more explanatory?
+- **Audience** — Who's this for — beginners, practitioners, decision-makers? How much do they already know?
+- **Angle / hook** — What made you want to write this now? A fresh perspective, a lesson you learned, a thing people get wrong, a reaction to something timely?
+- **Your experience with it** — Have you done/built/tested this yourself? First-hand specifics (numbers, what broke, what surprised you) are what make a post credible — pull them out early.
+- **Scope & depth** — Broad overview or deep on one part? Any length in mind (short take vs in-depth)? (Maps to `--length`.)
+- **Where it lives & voice** — Your own site (first-person, opinionated) or a work/program blog (measured, org-representing)? (Maps to `--target`.)
+- **Must-haves / must-avoids** — Anything specific to include (a tool, an example, a section), or anything to steer clear of?
+- **For security topics** — Is this a defensive writeup, a disclosed finding, or general commentary? Anything under embargo or not yet public?
+
+Keep it tight — 3–6 questions, the ones that genuinely change the piece, phrased conversationally. Put them in a clear numbered block and **wait for answers before drafting.** If the user says "just go" or "you decide," proceed on your best read and *state the assumptions you made* so they can correct course. If they already answered some of this in their prompt, don't re-ask it — only fill the real gaps.
+
+Once you have their answers, pin down the angle:
 - **The one idea.** If the reader remembers exactly one sentence, what is it? Write it down. Everything serves it.
 - **Who it's for and what they already know.** A total beginner and a working practitioner need different posts. Pick one.
 - **Why now / why you.** What's the hook — a fresh take, a hard-won lesson, a thing everyone gets wrong, a timely event?
@@ -185,6 +200,7 @@ Voice and framing shift depending on where the post lives. Default to **personal
 Ask for the exact output format only when it matters: default to plain **CommonMark** that pastes anywhere; add YAML frontmatter or platform conventions (Astro, Next/MDX, Hugo, Dev.to, Medium, Substack) if the user names their setup. When you don't know the site's format, deliver clean Markdown and note that frontmatter can be added on request.
 
 ## Rules
+- Interview before you draft — ask 3–6 sharp, topic-specific questions and wait for answers. Don't guess at intent you could just ask about.
 - Do all five stages — angle, research, outline, draft, edit. The edit pass is where the quality lives.
 - Verify every fact, stat, and quote via web search; never invent one. Flag opinion as opinion.
 - Specificity over adjectives — real numbers, real examples, real names.
@@ -198,7 +214,9 @@ Ask for the exact output format only when it matters: default to plain **CommonM
 - End the post with a thought, not a summary of itself.
 
 ## Edge Cases
-- **No topic given:** Ask for one and offer 3 angle options once you have it.
+- **No topic given:** Ask what they want to write about, then run the clarifying interview once you have a topic.
+- **Topic given, but thin on context:** This is the norm — run the clarifying interview (3–6 questions) before drafting. That's the whole point: turn a bare angle into a well-formed brief.
+- **User says "just write it" / "you decide":** Proceed on your best read, but state the key assumptions you made (audience, angle, length, voice) so they can redirect after seeing the draft.
 - **Topic too broad:** Narrow to one arguable angle, say which you chose, and why.
 - **Security research / vulnerability topic:** Use the security-walkthrough archetype — lead with impact, land on detection and remediation, keep it defensive (canaries over live payloads, no turnkey exploit), and add responsible-disclosure notes. Route to `/prompt-injection-probe`, `/vuln-triage`, or `/disclosure-writer` if the underlying work belongs there.
 - **Time-sensitive topic:** Note the date and flag what may age out, so the post can be updated later.

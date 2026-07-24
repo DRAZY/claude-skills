@@ -214,6 +214,7 @@ Writes a complete, publish-ready long-form article on **any topic** — not a sk
 ```
 
 **What's included:**
+- **Interviews you first** — hand it a topic or rough angle and it asks 3–6 sharp, topic-specific clarifying questions (the point, the audience, your hook, your first-hand experience, scope, where it'll live) before writing a word, so the post reflects *your* intent instead of assumptions. Say "just go" and it proceeds on its best read and states its assumptions.
 - A real **five-stage process**, not one pass: angle → research (with source verification) → outline → full draft → self-edit
 - **10 post archetypes**, each with a structure that fits the genre: tutorial, **security walkthrough / vulnerability writeup**, explainer, opinion, **market / industry analysis**, review, case study, news analysis, listicle, personal essay
 - **Length tiers** — short (~600–1,000) to definitive (4,000+); depth fits the topic, never padded to a count
