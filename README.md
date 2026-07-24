@@ -1,8 +1,23 @@
 # Claude Code Custom Skills
 
-A production-grade collection of custom [Claude Code](https://claude.ai/claude-code) skills for content creation, AI development, AI security research, security auditing, defensive research, community management, and AI framework expertise — several of which run as continual, loop-aware workflows.
+A production-grade collection of **19 custom [Claude Code](https://claude.ai/claude-code) skills** for content creation, AI development, AI security research, security auditing, defensive research, community management, and AI framework expertise — several of which run as continual, loop-aware workflows rather than one-shot generators.
 
-These skills use advanced Claude Code features including `context: fork` for isolated execution, `allowed-tools` for precise tool access, dynamic context injection (`!`command``), skill chaining, and structured output templates.
+These skills use advanced Claude Code features: `context: fork` for isolated execution, `allowed-tools` for precise tool access, dynamic context injection (`!`command``), bundled zero-dependency scripts for deterministic work, a `loop:` frontmatter contract for continual operation, router-optimized `USE WHEN` / `NOT FOR` descriptions, skill chaining, and structured output templates.
+
+---
+
+## What's New in 2.0
+
+Version 2.0 turns the collection from a set of one-shot generators into a system that can **work continually** and adds a dedicated **GenAI security** track.
+
+- **Continual loops.** A new [`/loop-runner`](#continual-loops) meta-skill runs any loop-enabled skill on a schedule via three archetypes — **Monitor** (watch for change, report only the delta), **Producer** (generate without ever repeating), and **Pursuit** (work a backlog to a conclusion). The governing rule: a loop reports the *delta*, not the report, and a working loop always ends in a stated conclusion — **converged** (done) or **interrupted** (stopped, here's what remains) — never a silent drop-off.
+- **A GenAI security spine — find → triage → disclose.** Three new skills map to the AI-security lifecycle: [`/prompt-injection-probe`](#ai-security-research) (canary-scored injection/jailbreak/extraction battery against an authorized target), [`/vuln-triage`](#ai-security-research) (bug-bounty submission triage), and [`/disclosure-writer`](#ai-security-research) (coordinated responsible-disclosure package). The first two are Pursuit loops.
+- **Deterministic bundled scripts.** Loop skills ship zero-dependency Node scripts (e.g. `stack-check`'s `check-versions.mjs` hits npm/PyPI directly) so results are reproducible — the precondition for a trustworthy diff. No more re-deriving "latest version" via web search each run.
+- **Router-optimized descriptions.** Every skill's `description` was rewritten to the `USE WHEN <triggers> / NOT FOR <adjacent job> (use other-skill)` contract, so Claude auto-invokes the *right* skill and the overlapping content/security skills no longer collide.
+- **Safety by contract.** A `loop:` frontmatter block gates unattended execution: only `writes: report-only` skills may loop on a schedule; file- and infrastructure-writing skills (`app-scaffold`, `red-team-scaffold`, `defense-analyst`) are explicitly loop-excluded. Security-sensitive loop state is gitignored because it describes unfixed vulnerabilities.
+- **Repo hygiene.** Current, verified Claude model IDs throughout; added `LICENSE` and `.gitignore`; a working GitHub Actions loop example.
+
+Full detail in [`CHANGELOG.md`](CHANGELOG.md).
 
 ---
 
@@ -25,7 +40,7 @@ git clone https://github.com/DRAZY/claude-skills.git ~/.claude/skills
 
 | Skill | Category | Key Features |
 |---|---|---|
-| [`/content-plan`](#content-plan) | Content | WebSearch for trends, 9 platforms (incl. Bluesky/Threads/Mastodon), analytics-informed planning, skill chaining |
+| [`/content-plan`](#content-plan) | Content | WebSearch for trends, 9 platforms (incl. Bluesky/Threads/Mastodon), analytics-informed planning, **Producer loop mode** (never repeats a topic) |
 | [`/script-writer`](#script-writer) | Content | 6 formats (youtube, short, blog, thread, podcast, newsletter), code tutorial variant, word count targets |
 | [`/seo-optimize`](#seo-optimize) | Content | 4 platforms (youtube, blog, podcast, github), before/after comparison, keyword research, volume disclaimers |
 | [`/social-repurpose`](#social-repurpose) | Content | 8 platforms (incl. Bluesky, Threads, Reddit), hard character limits, de-duplication, posting schedule |
@@ -35,7 +50,7 @@ git clone https://github.com/DRAZY/claude-skills.git ~/.claude/skills
 | [`/app-scaffold`](#app-scaffold) | Development | Node/Bun/Deno runtime support, latest version verification, CI/CD, security defaults, post-build validation |
 | [`/claude-api`](#claude-api) | Development | Claude API/SDK patterns, streaming, tool use, prompt caching, batch API, agent patterns |
 | [`/secure-review`](#secure-review) | Security | Forked context, 3-layer audit, Ghost + manual, confidence levels |
-| [`/stack-check`](#stack-check) | Security | Forked context, health score, license audit, exact upgrade commands |
+| [`/stack-check`](#stack-check) | Security | **Deterministic registry script** (npm/PyPI), health score, license audit, exact upgrade commands, **Monitor loop mode** |
 | [`/community-manager`](#community-manager) | Community | 7 focus areas, parameterizable community profile, competitor intel, templates, metrics dashboards |
 | [`/defense-analyst`](#defense-analyst) | Security | macOS binary analysis, CVSS scoring, defensive tools, vuln reports |
 | [`/red-team-scaffold`](#red-team-scaffold) | Security | GenAI red team infra — exfil server, vulnerable MCP, sandbox |
@@ -149,9 +164,12 @@ These skills leverage Claude Code's full capabilities:
 
 | Feature | Skills Using It | Purpose |
 |---|---|---|
+| `loop:` contract | loop-runner, stack-check, content-plan, prompt-injection-probe, vuln-triage | Declares loop archetype + `writes` gate; only `report-only` may run unattended |
+| Bundled zero-dep scripts | stack-check (`check-versions.mjs`), loop-runner (`loop-state.mjs`) | Deterministic work (registry lookups, state/delta) so loop diffs are trustworthy |
+| `USE WHEN` / `NOT FOR` descriptions | ALL | Router-optimized so Claude auto-invokes the right skill; disambiguates overlapping skills |
 | `context: fork` | secure-review, stack-check, tool-review, defense-analyst | Runs in isolated subagent — verbose output stays out of main context |
 | `allowed-tools` | ALL | Declares exactly which tools each skill needs |
-| `disable-model-invocation` | app-scaffold, secure-review, defense-analyst, red-team-scaffold | Prevents auto-triggering on side-effect-heavy skills |
+| `disable-model-invocation` | app-scaffold, secure-review, defense-analyst, red-team-scaffold, prompt-injection-probe | Prevents auto-triggering on side-effect-heavy or authorization-gated skills |
 | Dynamic context `!`cmd`` | content-plan, app-scaffold, secure-review, stack-check, seo-optimize | Pre-fetches project data before Claude starts processing |
 | Skill chaining | ALL | Every skill suggests next skills to run in a pipeline |
 | Structured output | ALL | Consistent templates with tables, code blocks, and checklists |
@@ -179,6 +197,8 @@ Generates a 7-day content calendar with web-searched trending topics. Supports 9
 - Skill chain: suggests `/script-writer` → `/seo-optimize` → `/social-repurpose`
 
 **Handles:** No input (asks + suggests trending topics), too-broad topics (narrows with 3 angles), multiple topics (mixed calendar), weekend exclusions, past performance data.
+
+**Loop mode (Producer):** **reference implementation of the Producer archetype.** Run weekly, it never re-suggests a topic it already planned — a seen-ledger keys on the *concept* (not the exact title), and it flags when it's running dry rather than padding the calendar with repeats. See [Continual Loops](#continual-loops).
 
 ---
 
@@ -397,7 +417,7 @@ Comprehensive security audit running in forked context. Manual-invoke only.
 
 ### `/stack-check`
 
-Audits every dependency with a health score. Runs in forked context.
+Audits every dependency with a health score. Runs in forked context. **Reference implementation of the Monitor loop archetype.**
 
 ```
 /stack-check
@@ -406,13 +426,17 @@ Audits every dependency with a health score. Runs in forked context.
 
 **Detects:** Node.js, Python, Go, Ruby, Rust, Java/Kotlin, PHP, .NET, Docker base images, GitHub Actions, framework configs. Also checks runtime versions.
 
+**Deterministic core:** a bundled zero-dependency script (`check-versions.mjs`) queries the npm and PyPI registries directly — with deprecation/abandonment detection and an optional `npm audit` CVE overlay — instead of web-searching each package. Same input, same output every run; web search is demoted to enrichment (breaking-change notes, uncovered ecosystems).
+
 **For each package:**
-- Current version vs. latest stable (verified via web search with date)
+- Current version vs. latest stable (from the registry, reproducibly)
 - Status: ✅ Current / 🔵 Minor / 🟠 Major / ⚠️ Deprecated / 🔴 EOL / 🚨 Vulnerable
 - **Exact upgrade command** (not "consider upgrading")
 - Breaking changes and migration notes for major updates
 
 **Health score:** 0-100 with clear scoring formula. **License audit** flags GPL/AGPL in commercial projects. **Upgrade order** ensures safe sequential updates.
+
+**Loop mode (Monitor):** on a schedule it reports only the *delta* — a new CVE, a fresh major, a package that just went deprecated — and stays silent when nothing moved. A pinned package is remembered so it isn't re-flagged. See [Continual Loops](#continual-loops).
 
 ---
 
@@ -745,6 +769,7 @@ bare `: ` inside the value (it breaks YAML parsing) — use ` — ` instead.
 | `disable-model-invocation` | Manual-only (prevents auto-trigger) | For skills with side effects |
 | `argument-hint` | Shown in autocomplete | `"[topic] [format]"` |
 | `model` | Route to specific model | `sonnet`, `opus`, `haiku` |
+| `loop:` | Makes a skill loop-enabled | `{ archetype: monitor, writes: report-only }` — see [`loop-runner/references/LoopContract.md`](loop-runner/references/LoopContract.md) |
 
 ---
 
