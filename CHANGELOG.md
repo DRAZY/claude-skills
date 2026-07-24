@@ -2,6 +2,11 @@
 
 All notable changes to this skill collection are documented here.
 
+## [2.1.1] - 2026-07-24
+
+### Added
+- **`scripts/sync-skills.sh`** — safely install/update this repo's skills into a local Claude Code skills directory (e.g. `~/.claude/skills`) that may already hold other skills. Copies only the skills this repo owns, dry-runs by default (preview before writing), is idempotent, and refuses to overwrite a same-named skill it didn't install unless `--force` is passed — so a shared PAI/LifeOS install is never clobbered. Supports single-skill or all-skills sync, `--list`, and a configurable `--target` / `$CLAUDE_SKILLS_DIR`. README documents the shared-directory install path.
+
 ## [2.1.0] - 2026-07-24
 
 ### New Skills

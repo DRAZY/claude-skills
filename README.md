@@ -754,6 +754,23 @@ git clone https://github.com/DRAZY/claude-skills.git ~/.claude/skills
 cd ~/.claude/skills && git pull
 ```
 
+### Install into an existing skills directory (safe sync)
+
+If your `~/.claude/skills/` already holds other skills (e.g. a PAI/LifeOS install) and you *don't* want to make the whole directory this repo, use the bundled sync script. It copies only the skills **this repo owns** and never touches anything else — it refuses to overwrite a same-named skill it didn't install unless you pass `--force`.
+
+```bash
+# Clone the repo somewhere (not into ~/.claude/skills)
+git clone https://github.com/DRAZY/claude-skills.git ~/code/claude-skills
+cd ~/code/claude-skills
+
+scripts/sync-skills.sh                 # preview ALL skills (dry run — writes nothing)
+scripts/sync-skills.sh --apply         # install/update all of them
+scripts/sync-skills.sh blog-writer --apply   # just one
+scripts/sync-skills.sh --list          # list installable skills
+```
+
+To pull future updates in, `git pull` in the clone and re-run `scripts/sync-skills.sh --apply`. Override the target with `--target <dir>` or `$CLAUDE_SKILLS_DIR`. Start a new Claude Code session afterward — skills load at startup.
+
 ### Verify
 Open Claude Code and type `/` — all skills should appear in autocomplete.
 
