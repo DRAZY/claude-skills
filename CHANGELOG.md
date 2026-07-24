@@ -2,6 +2,11 @@
 
 All notable changes to this skill collection are documented here.
 
+## [2.1.2] - 2026-07-24
+
+### Changed
+- **`/blog-writer` (v1.4.0 -> v1.5.0)** — Two focused craft additions. **Headline craft:** the three headline options are now genuinely distinct angles (benefit / curiosity / plain) written to balance click-worthiness against honesty, with any overpromising option flagged — headline *writing*, explicitly deferring SEO (keywords, char limits, meta) to `/seo-optimize`. **Series mode:** when a topic is too big for one post, the skill proposes a 2–4 part series with self-contained parts, connective tissue, and a real arc — writing the first part fully and outlining the rest — instead of bloating one article. Held the line against scope creep: no new archetypes, no SEO overlap, no bloat.
+
 ## [2.1.1] - 2026-07-24
 
 ### Added
