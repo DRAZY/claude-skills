@@ -38,6 +38,3 @@ Thumbs.db
 .claude/skill-state/prompt-injection-probe/
 *.local.json
 
-# Half-imported skill — not part of the published collection yet.
-# Remove this line once Media/ is finished (or delete the directory).
-Media/
