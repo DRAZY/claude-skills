@@ -1,5 +1,11 @@
 # Claude Code Custom Skills
 
+[![Stars](https://img.shields.io/github/stars/DRAZY/claude-skills?color=D97757)](../../stargazers)
+[![Last commit](https://img.shields.io/github/last-commit/DRAZY/claude-skills?color=D97757)](../../commits/main)
+[![Nightly stack check](https://img.shields.io/github/actions/workflow/status/DRAZY/claude-skills/nightly-stack-check.yml?branch=main&label=nightly%20stack%20check)](../../actions/workflows/nightly-stack-check.yml)
+![Skills](https://img.shields.io/badge/skills-20-D97757)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
 A production-grade collection of **20 custom [Claude Code](https://claude.ai/claude-code) skills** for content creation, AI development, AI security research, security auditing, defensive research, community management, and AI framework expertise — several of which run as continual, loop-aware workflows rather than one-shot generators.
 
 These skills use advanced Claude Code features: `context: fork` for isolated execution, `allowed-tools` for precise tool access, dynamic context injection (`!`command``), bundled zero-dependency scripts for deterministic work, a `loop:` frontmatter contract for continual operation, router-optimized `USE WHEN` / `NOT FOR` descriptions, skill chaining, and structured output templates.
