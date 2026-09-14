@@ -1,5 +1,8 @@
 # Claude Code Custom Skills
 
+[![Release](https://img.shields.io/github/v/release/DRAZY/claude-skills?color=D97757&label=release)](../../releases/latest)
+[![Downloads](https://img.shields.io/github/downloads/DRAZY/claude-skills/total?color=D97757&label=downloads)](../../releases)
+[![Clones](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2FDRAZY%2Fclaude-skills%2Fmain%2Fstats%2Fclones.json&query=%24.total_clones&label=clones&color=D97757)](stats/clones.json)
 [![Stars](https://img.shields.io/github/stars/DRAZY/claude-skills?color=D97757)](../../stargazers)
 [![Last commit](https://img.shields.io/github/last-commit/DRAZY/claude-skills?color=D97757)](../../commits/main)
 [![Nightly stack check](https://img.shields.io/github/actions/workflow/status/DRAZY/claude-skills/nightly-stack-check.yml?branch=main&label=nightly%20stack%20check)](../../actions/workflows/nightly-stack-check.yml)
@@ -28,6 +31,10 @@ Full detail in [`CHANGELOG.md`](CHANGELOG.md).
 ---
 
 ## Quick Start
+
+**Option A: download the release zip** — grab the latest `claude-skills-<version>.zip` from the [Releases page](../../releases/latest) and unzip it into `~/.claude/skills`.
+
+**Option B: clone the repo**
 
 ```bash
 # Clone into your Claude Code skills directory

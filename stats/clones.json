@@ -1,0 +1,65 @@
+{
+  "schema": "clone-stats/v1",
+  "since": "2026-08-30",
+  "updated": "2026-09-14T03:23:17.486Z",
+  "total_clones": 24,
+  "unique_cloners_14d": 10,
+  "days": {
+    "2026-08-30": {
+      "count": 2,
+      "uniques": 2
+    },
+    "2026-08-31": {
+      "count": 2,
+      "uniques": 2
+    },
+    "2026-09-01": {
+      "count": 3,
+      "uniques": 3
+    },
+    "2026-09-02": {
+      "count": 1,
+      "uniques": 1
+    },
+    "2026-09-03": {
+      "count": 1,
+      "uniques": 1
+    },
+    "2026-09-04": {
+      "count": 2,
+      "uniques": 2
+    },
+    "2026-09-05": {
+      "count": 1,
+      "uniques": 1
+    },
+    "2026-09-06": {
+      "count": 4,
+      "uniques": 3
+    },
+    "2026-09-07": {
+      "count": 2,
+      "uniques": 2
+    },
+    "2026-09-08": {
+      "count": 1,
+      "uniques": 1
+    },
+    "2026-09-09": {
+      "count": 1,
+      "uniques": 1
+    },
+    "2026-09-10": {
+      "count": 1,
+      "uniques": 1
+    },
+    "2026-09-11": {
+      "count": 2,
+      "uniques": 2
+    },
+    "2026-09-12": {
+      "count": 1,
+      "uniques": 1
+    }
+  }
+}
